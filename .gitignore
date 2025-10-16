@@ -1,0 +1,87 @@
+# -----------------------------
+# Turborepo / Monorepo
+# -----------------------------
+.turbo/
+node_modules/
+pnpm-lock.yaml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.DS_Store
+
+# -----------------------------
+# Next.js
+# -----------------------------
+.next/
+out/
+dist/
+.vercel/
+coverage/
+*.local
+*.log
+
+# -----------------------------
+# Shared packages
+# -----------------------------
+packages/**/node_modules/
+packages/**/dist/
+packages/**/.turbo/
+
+# -----------------------------
+# Docker / Build
+# -----------------------------
+*.pid
+*.seed
+*.bak
+*.swp
+*.swo
+*.tmp
+*~
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+**/Dockerfile*
+**/build/
+**/tmp/
+**/logs/
+**/coverage/
+
+# -----------------------------
+# ASP.NET Core
+# -----------------------------
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+project.lock.json
+artifacts/
+
+# ASP.NET environment
+appsettings.*.json
+appsettings.Development.json
+Properties/launchSettings.json
+
+# -----------------------------
+# IDE / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# -----------------------------
+# OS-specific
+# -----------------------------
+Thumbs.db
+ehthumbs.db
+Icon?
+__MACOSX/
