@@ -1,41 +1,45 @@
+using Microsoft.AspNetCore.Authorization;
+using Clerk.Net.AspNetCore.Security;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// origin:
+builder.Services.AddCors(opts =>
+{
+  opts.AddPolicy("frontend", p =>
+    p.WithOrigins("http://localhost:3000")
+     .AllowAnyHeader()
+     .AllowAnyMethod());
+});
+
+//  Clerk authentication:
+builder.Services.AddAuthentication(ClerkAuthenticationDefaults.AuthenticationScheme)
+  .AddClerkAuthentication(x =>
+  {
+
+    x.Authority = builder.Configuration["Clerk:Authority"]!;
+
+    x.AuthorizedParty = builder.Configuration["Clerk:AuthorizedParty"]!;
+  });
+
+builder.Services.AddAuthorizationBuilder()
+  .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build());
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.UseCors("frontend");
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.UseHttpsRedirection();
+app.MapGet("/api/health", () => new { ok = true });
 
-var summaries = new[]
+app.MapGet("/api/profile", (HttpContext ctx) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+  var userId = ctx.User.FindFirst("sub")?.Value
+           ?? ctx.User.FindFirst("user_id")?.Value;
+  return Results.Ok(new { userId, hello = "secured world" });
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
