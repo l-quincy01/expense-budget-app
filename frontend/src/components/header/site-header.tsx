@@ -1,18 +1,10 @@
-"use client";
-import React from "react";
-import { SimpleHeader } from "./simple-header";
-import { useUser } from "@clerk/nextjs";
-import { SiteHeader } from "../site-header";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
-export default function Header() {
-  const { isSignedIn } = useUser();
-
+export function SiteHeader() {
   return (
-    <div className="mb-4">{isSignedIn ? <SiteHeader /> : <SimpleHeader />}</div>
-  );
-}
-/*
-<header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator
@@ -34,4 +26,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-*/
+  );
+}

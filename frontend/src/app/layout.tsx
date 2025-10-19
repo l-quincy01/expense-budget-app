@@ -7,6 +7,8 @@ import "./globals.css";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,25 +32,36 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider signInUrl="/login">
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 54)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
+      >
+        <html lang="en" suppressHydrationWarning>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
-            <Header />
-            <div className=" container mx-auto">
-              {children}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <AppSidebar variant="floating" />
 
-              <Footer />
-            </div>
-          </ThemeProvider>
-        </body>
-      </html>
+              <div className="max-w-md  sm:max-w-[620px] md:lg:max-w-[860px] lg:max-w-[1000px]    2xl:max-w-[1080px]   mx-auto px">
+                <Header />
+                {children}
+
+                <Footer />
+              </div>
+            </ThemeProvider>
+          </body>
+        </html>
+      </SidebarProvider>
     </ClerkProvider>
   );
 }
