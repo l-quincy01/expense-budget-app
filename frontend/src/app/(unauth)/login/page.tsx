@@ -1,5 +1,5 @@
+"use client";
 import { LoginForm } from "@/components/login-form";
-import { SignIn } from "@clerk/nextjs";
 
 export default function LoginPage() {
   return (

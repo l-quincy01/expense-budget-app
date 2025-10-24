@@ -52,7 +52,7 @@ export default function RootLayout({
             >
               <AppSidebar variant="floating" />
 
-              <div className="max-w-md  sm:max-w-[620px] md:lg:max-w-[860px] lg:max-w-[1000px]    2xl:max-w-[1080px]   mx-auto px">
+              <div className=" container mx-auto p-4">
                 <Header />
                 {children}
 
@@ -65,3 +65,14 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+
+/*
+       <div className="max-w-md  sm:max-w-[620px] md:lg:max-w-[720px] @max-[896px]:max-w-[860px] lg:max-w-[1000px]    2xl:max-w-[1080px]   mx-auto px">
+                <Header />
+                {children}
+
+                <Footer />
+              </div>
+
+
+*/

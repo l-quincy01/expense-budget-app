@@ -31,8 +31,8 @@ export function SimpleHeader() {
   ];
 
   return (
-    <header className="fixed top-4 z-50 w-full  backdrop-blur-lg">
-      <nav className="mx-auto flex h-14 w-full max-w-4xl items-center justify-between px-4">
+    <header className=" top-4 z-50 w-full  backdrop-blur-lg">
+      <nav className="flex h-14 w-full max-w-4xl items-center justify-between px-4">
         <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
           <p className=" text-lg font-bold">Budgetly-AI</p>
         </Link>
