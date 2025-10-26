@@ -2,6 +2,7 @@
 
 import { TrendingUp } from "lucide-react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { Area, AreaChart } from "recharts";
 
 import {
   Card,
@@ -17,6 +18,15 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
 
 export const description = "A linear line chart";
 
@@ -74,34 +84,106 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartLineLinear() {
+  const [chartType, setChartType] = useState<any>();
+  const [areaChart, setAreaChart] = useState(false);
+
+  // useEffect(() =>{
+
+  // }, [chartType])
+
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Spend Line Chart</CardTitle>
-        {/* <CardDescription>January - December 2025</CardDescription> */}
+      <CardHeader className="flex flex-row justify-between">
+        <div>
+          <CardTitle>Spend Line Chart</CardTitle>
+          <CardDescription>January - December 2025</CardDescription>
+        </div>
+        <div className="flex flex-row gap-2 items-center">
+          <Select
+            defaultValue="linear"
+            onValueChange={(value) => {
+              setChartType(value);
+            }}
+          >
+            <SelectTrigger
+              className="flex w-fit @4xl/main:hidden"
+              size="sm"
+              id="view-selector"
+            >
+              <SelectValue placeholder="Select a view" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="linear"> Linear </SelectItem>
+              <SelectItem value="natural"> Line </SelectItem>
+              <SelectItem value="step"> Step </SelectItem>
+              {/* <SelectItem value="Step"> Line Dots</SelectItem> */}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="secondary"
+            className={`${areaChart ? "bg-accent" : "bg-transparent"}`}
+            onClick={() => {
+              setAreaChart((p) => !p);
+            }}
+          >
+            Area Chart
+          </Button>
+        </div>
       </CardHeader>
+
       <CardContent>
         <ChartContainer config={chartConfig} className="w-full">
-          <LineChart data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Line
-              dataKey="amount"
-              type="natural"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
+          {areaChart ? (
+            <AreaChart
+              accessibilityLayer
+              data={chartData}
+              margin={{
+                left: 12,
+                right: 12,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+              <Area
+                dataKey="amount"
+                type={chartType}
+                fill="var(--color-desktop)"
+                fillOpacity={0.4}
+                stroke="var(--color-desktop)"
+              />
+            </AreaChart>
+          ) : (
+            <LineChart data={chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+
+              <Line
+                dataKey="amount"
+                type={chartType}
+                stroke="var(--color-desktop)"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          )}
         </ChartContainer>
       </CardContent>
     </Card>

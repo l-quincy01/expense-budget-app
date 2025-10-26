@@ -52,17 +52,17 @@ export const description = "A bar chart";
 export const chartData2 = [
   {
     category: "GeneralRetail",
-    totalSpend: 180, // Eat Fresh, Vida
+    totalSpend: 180,
     fill: "var(--color-GeneralRetail)",
   },
   {
     category: "Transport",
-    totalSpend: 400, // Gautrain
+    totalSpend: 400,
     fill: "var(--color-Transport)",
   },
   {
     category: "EatingOutAndTreats",
-    totalSpend: 518, // Nandos, KFC
+    totalSpend: 518,
     fill: "var(--color-EatingOutAndTreats)",
   },
   {
@@ -72,12 +72,12 @@ export const chartData2 = [
   },
   {
     category: "Groceries",
-    totalSpend: 468, // Checkers, Takealot groceries
+    totalSpend: 468,
     fill: "var(--color-Groceries)",
   },
   {
     category: "ProfessionalServices",
-    totalSpend: 410, // ChatGPT sub
+    totalSpend: 410,
     fill: "var(--color-ProfessionalServices)",
   },
   {
@@ -87,7 +87,7 @@ export const chartData2 = [
   },
   {
     category: "DonationsAndGiving",
-    totalSpend: 250, // Payment to Bro Lesego
+    totalSpend: 250,
     fill: "var(--color-DonationsAndGiving)",
   },
   {
@@ -102,7 +102,7 @@ export const chartData2 = [
   },
   {
     category: "HomewareAndAppliances",
-    totalSpend: 115, // Microsoft purchase
+    totalSpend: 115,
     fill: "var(--color-HomewareAndAppliances)",
   },
   {
@@ -127,13 +127,12 @@ export const chartData2 = [
   },
   {
     category: "Other",
-    totalSpend: 80, // Service Fees, Byc Debit, Misc
+    totalSpend: 80,
     fill: "var(--color-Other)",
   },
 ];
 
 export function aggregateTopCategories(data: ChartData[]): ChartData[] {
-  // 1️⃣ Aggregate totals per category
   const aggregated = data.reduce<Record<string, ChartData>>((acc, curr) => {
     if (!acc[curr.category]) {
       acc[curr.category] = { ...curr };
@@ -143,15 +142,12 @@ export function aggregateTopCategories(data: ChartData[]): ChartData[] {
     return acc;
   }, {});
 
-  // 2️⃣ Convert to array and sort descending by totalSpend
   const sorted = Object.values(aggregated).sort(
     (a, b) => b.totalSpend - a.totalSpend
   );
 
-  // 3️⃣ Take top 4
   const top4 = sorted.slice(0, 4);
 
-  // 4️⃣ Combine remaining into "Other"
   const others = sorted.slice(4);
   const otherTotal = others.reduce((sum, c) => sum + c.totalSpend, 0);
 
@@ -181,7 +177,7 @@ const chartConfig = {
     color: "var(--chart-2)",
   },
   EatingOutAndTreats: {
-    label: "Eating Out & Treats",
+    label: "Eating Out And Treats",
     color: "var(--chart-3)",
   },
   Fuel: {
@@ -243,7 +239,7 @@ export function ChartBarDefault() {
     <Card>
       <CardHeader>
         <CardTitle>Bar Chart</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>Top 5 spending categories</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

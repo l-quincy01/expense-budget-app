@@ -34,7 +34,7 @@ export default function AddTransactionDialog() {
       newErrors.title = "Title must be at least 2 characters.";
     if (!amount) newErrors.amount = "Amount is required.";
     else if (!/^\d+(\.\d{1,2})?$/.test(amount) || parseFloat(amount) <= 0)
-      newErrors.amount = "Enter a valid positive amount (2 decimals max).";
+      newErrors.amount = "Enter a valid positive amount ";
 
     setErrors(newErrors);
   }, [title, amount, submitted]);

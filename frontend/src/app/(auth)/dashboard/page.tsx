@@ -12,14 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChartLineLinear } from "@/components/charts/chart-line-linear";
-import { ChartPieSeparatorNone } from "@/components/charts/chart-pie-separator-none";
-import { ChartLineMultiple } from "@/components/charts/chart-line-multiple";
-import { ChartAreaDefault } from "@/components/charts/chart-area-default";
-import { ChartBarDefault } from "@/components/charts/chart-bar-default";
+
 import SimpleTableManual from "@/components/table/simple-table-manual";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import {
+  ArrowDownWideNarrow,
+  BanknoteArrowDown,
+  BanknoteArrowUp,
+  Pencil,
+  Plus,
+  Utensils,
+  Wallet,
+} from "lucide-react";
 
 import {
   Dialog,
@@ -34,6 +38,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AddTransactionDialog from "@/components/table/Dialog/add-transaction-dialog";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import Headline from "@/components/dashboard/headline";
+import BudgetView from "@/components/dashboard/budget-view";
+import ChartsView from "@/components/dashboard/charts-view";
+import TableView from "@/components/dashboard/table-view";
 
 export default function Dashboard() {
   const api = useApi();
@@ -44,62 +62,11 @@ export default function Dashboard() {
   }, [api]);
 
   return (
-    <div className="flex flex-col gap-4 px-16">
-      <Select defaultValue="outline">
-        <SelectTrigger
-          className="flex w-fit @4xl/main:hidden"
-          size="sm"
-          id="view-selector"
-        >
-          <SelectValue placeholder="Select a view" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="outline">Spend Line Graph</SelectItem>
-          <SelectItem value="past-performance">
-            Spend Share By Category
-          </SelectItem>
-        </SelectContent>
-      </Select>
-
-      {/* <div className="grid grid-cols-3 gap-4">
-        <ChartRadarDots />
-        <ChartRadarDots />
-        <ChartRadarDots />
-      </div> */}
-
-      <div className="grid grid-cols-2 gap-4">
-        {" "}
-        <ChartAreaDefault />
-        <ChartLineLinear />
-        <ChartLineMultiple />
-        <ChartBarDefault />
-        <ChartPieSeparatorNone />
-      </div>
-
-      <div className="w-full flex justify-center items-center">
-        <div className="flex flex-col gap-4 py-2 w-9/10">
-          <div className="flex flex-row justify-between">
-            <Select defaultValue="outline">
-              <SelectTrigger
-                className="flex w-fit @4xl/main:hidden"
-                size="sm"
-                id="view-selector"
-              >
-                <SelectValue placeholder="Select a view" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="outline">Outline</SelectItem>
-                <SelectItem value="past-performance">Categories</SelectItem>
-                <SelectItem value="key-personnel">Spend History</SelectItem>
-              </SelectContent>
-            </Select>
-            <AddTransactionDialog />
-          </div>
-
-          {/* <SimpleTable /> */}
-          <SimpleTableManual />
-        </div>
-      </div>
+    <div className="flex flex-col gap-8 px-16">
+      <Headline />
+      <BudgetView />
+      <ChartsView />
+      <TableView />
     </div>
   );
 }
