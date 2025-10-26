@@ -11,15 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { CopyPlus, LayoutDashboard } from "lucide-react";
+import AddDashboard from "./dialogs/add-dashboard";
 
 export function NavMain({
   items,
@@ -35,23 +27,7 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <Dialog>
-              <DialogTrigger className="w-full">
-                <div className="flex flex-row items-center  gap-2 p-2 bg-accent-foreground/90 hover:bg-accent-foreground/75 rounded-2xl cursor-pointer">
-                  <CopyPlus className="text-accent" strokeWidth={1.5} />
-                  <span className="text-accent"> New Dashboard</span>
-                </div>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you absolutely sure?</DialogTitle>
-                  <DialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+            <AddDashboard />
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarGroup>

@@ -8,7 +8,7 @@ import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
