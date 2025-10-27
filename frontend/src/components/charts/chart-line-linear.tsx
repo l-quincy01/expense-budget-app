@@ -120,7 +120,8 @@ export function ChartLineLinear() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="linear">Linear</SelectItem>
-              <SelectItem value="natural">Line</SelectItem>
+              {/* <SelectItem value="natural">Natural</SelectItem> */}
+              {/* Removed due to misalignment */}
               <SelectItem value="step">Step</SelectItem>
               <SelectItem value="barChart">Bar</SelectItem>
             </SelectContent>

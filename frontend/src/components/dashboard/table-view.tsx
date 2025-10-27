@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AddTransactionDialog from "../table/Dialog/add-transaction-dialog";
 import SimpleTableManual from "../table/simple-table-manual";
 import {
@@ -12,12 +12,17 @@ import SimpleTable from "../table/simple-table";
 import { StatementTable } from "../table/statement-table";
 
 export default function TableView() {
+  const [tableView, setTableView] = useState("categoryTable");
+
   return (
     <div>
       <div className="w-full flex justify-center items-center">
-        <div className="flex flex-col gap-4 py-2 w-9/10">
+        <div className="flex flex-col gap-4 py-2 w-full">
           <div className="flex flex-row justify-between">
-            <Select defaultValue="category">
+            <Select
+              defaultValue="categoryTable"
+              onValueChange={(v) => setTableView(v)}
+            >
               <SelectTrigger
                 className="flex w-fit @4xl/main:hidden"
                 size="sm"
@@ -26,15 +31,14 @@ export default function TableView() {
                 <SelectValue placeholder="Select a view" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="category">Categories</SelectItem>
-                <SelectItem value="statement">Spend History</SelectItem>
+                <SelectItem value="categoryTable">Categories Table</SelectItem>
+                <SelectItem value="statementTable">Statement Table</SelectItem>
               </SelectContent>
             </Select>
             <AddTransactionDialog />
           </div>
-          <StatementTable />
-          {/* <SimpleTable />
-          <SimpleTableManual />  */}
+          {tableView === "categoryTable" && <StatementTable />}
+          {tableView === "statementTable" && <SimpleTableManual />}
         </div>
       </div>
     </div>

@@ -169,7 +169,8 @@ export function ChartLineMultiple() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="linear">Linear</SelectItem>
-              <SelectItem value="natural">Natural</SelectItem>
+              {/* <SelectItem value="natural">Natural</SelectItem> */}
+              {/* Removed due to misalignment */}
               <SelectItem value="step">Step</SelectItem>
               <SelectItem value="barMultiple">Bar Multiple</SelectItem>
             </SelectContent>
