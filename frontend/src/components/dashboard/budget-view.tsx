@@ -38,7 +38,7 @@ export default function BudgetView() {
     <div className="space-y-2">
       <div className="gap-1">
         <Select
-          defaultValue="outline"
+          defaultValue="topBudgets"
           onValueChange={(value) => {
             setBudgetView(value);
           }}

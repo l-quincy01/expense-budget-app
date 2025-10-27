@@ -48,23 +48,29 @@ interface pieData {
   totalSpend: number;
   fill: string;
 }
+interface chartData {
+  month: string;
+  category: categories;
+  totalSpend: number;
+  fill: string;
+}
 
 export const description = "A pie chart with no separator";
 
 export const chartData2 = [
   {
     category: "GeneralRetail",
-    totalSpend: 180, // Eat Fresh, Vida
+    totalSpend: 180,
     fill: "var(--color-GeneralRetail)",
   },
   {
     category: "Transport",
-    totalSpend: 400, // Gautrain
+    totalSpend: 400,
     fill: "var(--color-Transport)",
   },
   {
     category: "EatingOutAndTreats",
-    totalSpend: 518, // Nandos, KFC
+    totalSpend: 518,
     fill: "var(--color-EatingOutAndTreats)",
   },
   {

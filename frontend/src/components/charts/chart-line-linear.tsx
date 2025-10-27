@@ -1,14 +1,20 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-import { Area, AreaChart } from "recharts";
-
+import { useState, useEffect } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+} from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -25,10 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-
-export const description = "A linear line chart";
 
 const rawData = [
   {
@@ -84,12 +87,24 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartLineLinear() {
-  const [chartType, setChartType] = useState<any>();
+  const [chartType, setChartType] = useState("linear");
   const [areaChart, setAreaChart] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // useEffect(() =>{
+  // avoid hydration mismatch (Recharts SSR issue)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  // }, [chartType])
+  if (!mounted)
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Spend Line Chart</CardTitle>
+          <CardDescription>Loading chart...</CardDescription>
+        </CardHeader>
+      </Card>
+    );
 
   return (
     <Card className="w-full">
@@ -99,52 +114,51 @@ export function ChartLineLinear() {
           <CardDescription>January - December 2025</CardDescription>
         </div>
         <div className="flex flex-row gap-2 items-center">
-          <Select
-            defaultValue="linear"
-            onValueChange={(value) => {
-              setChartType(value);
-            }}
-          >
-            <SelectTrigger
-              className="flex w-fit @4xl/main:hidden"
-              size="sm"
-              id="view-selector"
-            >
+          <Select defaultValue="linear" onValueChange={setChartType}>
+            <SelectTrigger className="flex w-fit">
               <SelectValue placeholder="Select a view" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="linear"> Linear </SelectItem>
-              <SelectItem value="natural"> Line </SelectItem>
-              <SelectItem value="step"> Step </SelectItem>
-              {/* <SelectItem value="Step"> Line Dots</SelectItem> */}
+              <SelectItem value="linear">Linear</SelectItem>
+              <SelectItem value="natural">Line</SelectItem>
+              <SelectItem value="step">Step</SelectItem>
+              <SelectItem value="barChart">Bar</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            variant="secondary"
-            className={`${areaChart ? "bg-accent" : "bg-transparent"}`}
-            onClick={() => {
-              setAreaChart((p) => !p);
-            }}
-          >
-            Area Chart
-          </Button>
+          {chartType !== "barChart" && (
+            <Button
+              variant="secondary"
+              className={areaChart ? "bg-accent" : "bg-transparent"}
+              onClick={() => setAreaChart((p) => !p)}
+            >
+              Area Chart
+            </Button>
+          )}
         </div>
       </CardHeader>
 
       <CardContent>
         <ChartContainer config={chartConfig} className="w-full">
-          {areaChart ? (
-            <AreaChart
-              accessibilityLayer
-              data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
+          {chartType === "barChart" ? (
+            <BarChart data={chartData} margin={{ left: 12, right: 12 }}>
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Bar dataKey="amount" fill="var(--color-desktop)" radius={8} />
+            </BarChart>
+          ) : areaChart ? (
+            <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -165,7 +179,7 @@ export function ChartLineLinear() {
             <LineChart data={chartData}>
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -174,7 +188,6 @@ export function ChartLineLinear() {
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
               />
-
               <Line
                 dataKey="amount"
                 type={chartType}

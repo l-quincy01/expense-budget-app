@@ -13,6 +13,8 @@ import {
   XAxis,
   Area,
   AreaChart,
+  Bar,
+  BarChart,
 } from "recharts";
 
 import {
@@ -38,20 +40,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-export const description = "A multiple line/area chart with controls";
+export const description = "A multiple line/area/bar chart with controls";
 
 const chartConfig = {
   desktop: {
     label: "Income",
-    color: "var(--chart-1)",
+    color: "var(--income-color)",
   },
   mobile: {
     label: "Expense",
-    color: "var(--chart-2)",
+    color: "var(--expense-color)",
   },
   balance: {
     label: "Balance",
-    color: "var(--chart-3)",
+    color: "var(--balance-color)",
   },
 } satisfies ChartConfig;
 
@@ -135,7 +137,6 @@ const chartData = (() => {
     return {
       ...row,
       balance: Number(running.toFixed(2)),
-      label: `${row.month.slice(0, 3)} ${row.day}`,
     };
   });
 })();
@@ -143,6 +144,8 @@ const chartData = (() => {
 export function ChartLineMultiple() {
   const [chartType, setChartType] = useState<any>("linear");
   const [areaChart, setAreaChart] = useState<boolean>(false);
+
+  const isBarChart = chartType === "barMultiple";
 
   return (
     <Card className="w-full">
@@ -168,22 +171,48 @@ export function ChartLineMultiple() {
               <SelectItem value="linear">Linear</SelectItem>
               <SelectItem value="natural">Natural</SelectItem>
               <SelectItem value="step">Step</SelectItem>
+              <SelectItem value="barMultiple">Bar Multiple</SelectItem>
             </SelectContent>
           </Select>
 
-          <Button
-            variant="secondary"
-            className={`${areaChart ? "bg-accent" : "bg-transparent"}`}
-            onClick={() => setAreaChart((p) => !p)}
-          >
-            Area Chart
-          </Button>
+          {!isBarChart && (
+            <Button
+              variant="secondary"
+              className={`${areaChart ? "bg-accent" : "bg-transparent"}`}
+              onClick={() => setAreaChart((p) => !p)}
+            >
+              Area Chart
+            </Button>
+          )}
         </div>
       </CardHeader>
 
       <CardContent>
         <ChartContainer config={chartConfig}>
-          {areaChart ? (
+          {/* --- Bar Chart Multiple --- */}
+          {isBarChart ? (
+            <BarChart
+              accessibilityLayer
+              data={chartData}
+              barSize={64}
+              barGap={20}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dashed" />}
+              />
+              <Bar dataKey="income" fill="var(--income-color)" radius={1} />
+              <Bar dataKey="expense" fill="var(--expense-color)" radius={1} />
+              <Bar dataKey="balance" fill="var(--balance-color)" radius={1} />
+            </BarChart>
+          ) : areaChart ? (
             <AreaChart
               accessibilityLayer
               data={chartData}
@@ -191,7 +220,7 @@ export function ChartLineMultiple() {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="label"
+                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -201,8 +230,8 @@ export function ChartLineMultiple() {
               <Area
                 dataKey="income"
                 type={chartType}
-                stroke="var(--color-desktop)"
-                fill="var(--color-desktop)"
+                stroke="var(--income-color)"
+                fill="var(--income-color)"
                 fillOpacity={0.3}
                 name="Income"
               />
@@ -210,8 +239,8 @@ export function ChartLineMultiple() {
               <Area
                 dataKey="expense"
                 type={chartType}
-                stroke="var(--color-mobile)"
-                fill="var(--color-mobile)"
+                stroke="var(--expense-color)"
+                fill="var(--expense-color)"
                 fillOpacity={0.3}
                 name="Expense"
               />
@@ -219,8 +248,8 @@ export function ChartLineMultiple() {
               <Area
                 dataKey="balance"
                 type={chartType}
-                stroke="var(--color-balance)"
-                fill="var(--color-balance)"
+                stroke="var(--balance-color)"
+                fill="var(--balance-color)"
                 fillOpacity={0.2}
                 name="Balance"
               />
@@ -233,7 +262,7 @@ export function ChartLineMultiple() {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="label"
+                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -243,7 +272,7 @@ export function ChartLineMultiple() {
               <Line
                 dataKey="income"
                 type={chartType}
-                stroke="var(--color-desktop)"
+                stroke="var(--income-color)"
                 strokeWidth={2}
                 dot={false}
                 name="Income"
@@ -252,7 +281,7 @@ export function ChartLineMultiple() {
               <Line
                 dataKey="expense"
                 type={chartType}
-                stroke="var(--color-mobile)"
+                stroke="var(--expense-color)"
                 strokeWidth={2}
                 dot={false}
                 name="Expense"
@@ -261,7 +290,7 @@ export function ChartLineMultiple() {
               <Line
                 dataKey="balance"
                 type={chartType}
-                stroke="var(--color-balance)"
+                stroke="var(--balance-color)"
                 strokeWidth={2}
                 dot={false}
                 name="Balance"
