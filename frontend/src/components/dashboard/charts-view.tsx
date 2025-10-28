@@ -63,12 +63,12 @@ export default function ChartsView() {
         )}
         {chartView === "categories" && (
           <>
-            {/* <ChartLineLinear />
-            <ChartLineMultiple /> */}
             <ChartLineMultipleCategories />
-            {/* <ChartBarDefault /> */}
 
             <ChartPieSeparatorNone />
+            {/* <ChartLineLinear />
+            <ChartLineMultiple /> */}
+            {/* <ChartBarDefault /> */}
           </>
         )}
       </div>

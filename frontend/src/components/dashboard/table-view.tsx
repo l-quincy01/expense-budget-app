@@ -37,8 +37,8 @@ export default function TableView() {
             </Select>
             <AddTransactionDialog />
           </div>
-          {tableView === "categoryTable" && <StatementTable />}
-          {tableView === "statementTable" && <SimpleTableManual />}
+          {tableView === "statementTable" && <StatementTable />}
+          {tableView === "categoryTable" && <SimpleTableManual />}
         </div>
       </div>
     </div>

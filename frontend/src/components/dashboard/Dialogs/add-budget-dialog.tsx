@@ -37,7 +37,7 @@ export default function AddBudgetDialog() {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button size="icon">
+          <Button size="icon" variant="ghost">
             <Plus />
           </Button>
         </DialogTrigger>

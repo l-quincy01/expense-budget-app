@@ -30,6 +30,9 @@ import {
 } from "@/components/ui/card";
 import AddBudgetDialog from "./Dialogs/add-budget-dialog";
 import EditBudgetDialog from "./Dialogs/edit-budget-dialog";
+import DeleteBudget from "./Dialogs/delete-budget";
+import InfoBudgetView from "./Dialogs/info-budgetView";
+import { Button } from "../ui/button";
 
 export default function BudgetView() {
   const [budgetView, setBudgetView] = useState("topBudgets");
@@ -70,16 +73,24 @@ export default function BudgetView() {
               true ? "bg-transparent" : "bg-accent"
             }`}
           >
-            <ArrowDownWideNarrow />
+            <Button size="icon" variant="ghost">
+              <ArrowDownWideNarrow />
+            </Button>
+          </div>
+          <div className={`hover:bg-accent p-2 rounded-full`}>
+            <Button size="icon" variant="ghost">
+              <InfoBudgetView />
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 gap-4">
         {budgetView == "topBudgets" && (
-          <Card className="">
-            <CardContent className="flex flex-col  w-full ">
-              <div className=" self-end">
+          <Card className="py-2 px-0">
+            <CardContent className="flex flex-col gap-0  w-full justify-center  ">
+              <div className="flex flex-row justify-end  p-0 items-start">
+                <DeleteBudget />
                 <EditBudgetDialog />
               </div>
               <div className="flex flex-row items-center gap-4 justify-between">
@@ -92,7 +103,7 @@ export default function BudgetView() {
                 <div className="text-xl font-bold">R2500</div>
               </div>
 
-              <div className="flex flex-col gap-2 w-full mt-2">
+              <div className="flex flex-col gap-2 w-full my-4">
                 <div className="flex flex-row items-center w-full justify-between text-xs text-muted-foreground">
                   <div>Spend: R584</div>
                   <div>Remaining: R1916</div>

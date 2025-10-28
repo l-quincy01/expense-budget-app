@@ -28,7 +28,7 @@ export default function EditBudgetDialog() {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <button className="p-0 cursor-pointer">
+          <button className="hover:bg-accent p-2 rounded-2xl cursor-pointer">
             <Pencil size={14} />
           </button>
         </DialogTrigger>

@@ -221,7 +221,7 @@ export function ChartLineMultiple() {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -263,7 +263,7 @@ export function ChartLineMultiple() {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)}-${d.day}`}
+                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
