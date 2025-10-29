@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import SimpleTable from "../table/simple-table";
+
 import { StatementTable } from "../table/statement-table";
 
 export default function TableView() {

@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { BanknoteArrowDown, BanknoteArrowUp, Wallet } from "lucide-react";
 
 export default function Headline() {

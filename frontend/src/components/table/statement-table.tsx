@@ -20,7 +20,7 @@ const invoices = [
 export function StatementTable() {
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableCaption>Your statement</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="">Date</TableHead>

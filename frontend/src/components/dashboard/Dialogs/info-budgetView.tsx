@@ -15,7 +15,7 @@ export default function InfoBudgetView() {
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>Budgets are based on the current month. </p>
+        <p>Budget spent amounts are based on the current month. </p>
       </TooltipContent>
     </Tooltip>
   );

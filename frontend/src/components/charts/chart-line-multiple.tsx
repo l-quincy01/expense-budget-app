@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -39,15 +40,16 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { incomeExpenseLedger } from "@/types/data";
 
 export const description = "A multiple line/area/bar chart with controls";
 
 const chartConfig = {
-  desktop: {
+  income: {
     label: "Income",
     color: "var(--income-color)",
   },
-  mobile: {
+  expense: {
     label: "Expense",
     color: "var(--expense-color)",
   },
@@ -56,46 +58,6 @@ const chartConfig = {
     color: "var(--balance-color)",
   },
 } satisfies ChartConfig;
-
-const rawData2 = [
-  {
-    month: "September",
-    transactions: [
-      { day: "30", income: 0, expense: 59.5 },
-      { day: "30", income: 9782.33, expense: 0 },
-      { day: "30", income: 0, expense: 135.0 },
-      { day: "30", income: 0, expense: 0.0 },
-    ],
-  },
-  {
-    month: "October",
-    transactions: [
-      { day: "01", income: 0, expense: 53.0 },
-      { day: "01", income: 0, expense: 74.0 },
-      { day: "01", income: 0, expense: 112.0 },
-      { day: "01", income: 0, expense: 400.0 },
-      { day: "01", income: 0, expense: 410.41 },
-      { day: "01", income: 0, expense: 2.0 },
-      { day: "02", income: 0, expense: 250.0 },
-      { day: "02", income: 0, expense: 1557.86 },
-      { day: "04", income: 0, expense: 515.87 },
-      { day: "04", income: 0, expense: 1.99 },
-      { day: "07", income: 1569.0, expense: 0 },
-      { day: "07", income: 0, expense: 379.0 },
-      { day: "07", income: 0, expense: 467.91 },
-      { day: "07", income: 0, expense: 529.0 },
-      { day: "07", income: 0, expense: 7000.0 },
-      { day: "07", income: 0, expense: 0.0 },
-      { day: "10", income: 0, expense: 159.3 },
-      { day: "10", income: 0, expense: 115.71 },
-      { day: "11", income: 9.72, expense: 0 },
-      { day: "11", income: 9.72, expense: 0 },
-      { day: "11", income: 0, expense: 73.5 },
-      { day: "11", income: 0, expense: 0.55 },
-      { day: "11", income: 0, expense: 1.21 },
-    ],
-  },
-];
 
 const MONTH_INDEX: Record<string, number> = {
   January: 1,
@@ -112,10 +74,10 @@ const MONTH_INDEX: Record<string, number> = {
   December: 12,
 };
 
-const STARTING_BALANCE = 4347.7;
+const STARTING_BALANCE = 4347.7; //<----- MUST CHANGE
 
 const chartData = (() => {
-  const flat = rawData2.flatMap((m) =>
+  const flat = incomeExpenseLedger.flatMap((m) =>
     m.transactions.map((t) => ({
       month: m.month,
       day: t.day,

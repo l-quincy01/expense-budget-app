@@ -10,9 +10,6 @@ import { ChartLineLinear } from "@/components/charts/chart-line-linear";
 import { ChartPieSeparatorNone } from "@/components/charts/chart-pie-separator-none";
 import { ChartLineMultiple } from "@/components/charts/chart-line-multiple";
 
-import { ChartBarDefault } from "@/components/charts/chart-bar-default";
-
-import { ChartData } from "@/types/chart";
 import { LayoutGrid } from "lucide-react";
 import { ChartLineMultipleCategories } from "../charts/chart-line-multiple-categories";
 
@@ -52,7 +49,7 @@ export default function ChartsView() {
         </div>
       </div>
 
-      {/* Analysis Charts */}
+      {/* Trends Charts */}
       <div className={`grid grid-cols-${gridlayout ? "2" : "1"} gap-4`}>
         {" "}
         {chartView === "trends" && (
@@ -61,14 +58,11 @@ export default function ChartsView() {
             <ChartLineMultiple />
           </>
         )}
+        {/* Categories  Charts */}
         {chartView === "categories" && (
           <>
             <ChartLineMultipleCategories />
-
             <ChartPieSeparatorNone />
-            {/* <ChartLineLinear />
-            <ChartLineMultiple /> */}
-            {/* <ChartBarDefault /> */}
           </>
         )}
       </div>

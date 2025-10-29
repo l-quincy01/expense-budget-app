@@ -19,129 +19,11 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
+import { pieChartData } from "@/types/data";
+import { pieChart } from "@/types/types";
 
-type ChartData = {
-  category: string;
-  totalSpend: number;
-  fill: string;
-};
-
-type categories =
-  | "GeneralRetail"
-  | "Transport"
-  | "EatingOutAndTreats"
-  | "Fuel"
-  | "Groceries"
-  | "ProfessionalServices"
-  | "CarUseAndServices"
-  | "DonationsAndGiving"
-  | "GiftsAndFlowers"
-  | "Hobbies"
-  | "HomewareAndAppliances"
-  | "MusicGamingApps"
-  | "OutdoorAndAdventure"
-  | "PharmaciesAndWellbeing"
-  | "TravelAndHolidays";
-
-interface pieData {
-  category: categories;
-  totalSpend: number;
-  fill: string;
-}
-interface chartData {
-  month: string;
-  category: categories;
-  totalSpend: number;
-  fill: string;
-}
-
-export const description = "A pie chart with no separator";
-
-export const chartData2 = [
-  {
-    category: "GeneralRetail",
-    totalSpend: 180,
-    fill: "var(--color-GeneralRetail)",
-  },
-  {
-    category: "Transport",
-    totalSpend: 400,
-    fill: "var(--color-Transport)",
-  },
-  {
-    category: "EatingOutAndTreats",
-    totalSpend: 518,
-    fill: "var(--color-EatingOutAndTreats)",
-  },
-  {
-    category: "Fuel",
-    totalSpend: 0,
-    fill: "var(--color-Fuel)",
-  },
-  {
-    category: "Groceries",
-    totalSpend: 468,
-    fill: "var(--color-Groceries)",
-  },
-  {
-    category: "ProfessionalServices",
-    totalSpend: 410,
-    fill: "var(--color-ProfessionalServices)",
-  },
-  {
-    category: "CarUseAndServices",
-    totalSpend: 0,
-    fill: "var(--color-CarUseAndServices)",
-  },
-  {
-    category: "DonationsAndGiving",
-    totalSpend: 250,
-    fill: "var(--color-DonationsAndGiving)",
-  },
-  {
-    category: "GiftsAndFlowers",
-    totalSpend: 0,
-    fill: "var(--color-GiftsAndFlowers)",
-  },
-  {
-    category: "Hobbies",
-    totalSpend: 0,
-    fill: "var(--color-Hobbies)",
-  },
-  {
-    category: "HomewareAndAppliances",
-    totalSpend: 115,
-    fill: "var(--color-HomewareAndAppliances)",
-  },
-  {
-    category: "MusicGamingApps",
-    totalSpend: 0,
-    fill: "var(--color-MusicGamingApps)",
-  },
-  {
-    category: "OutdoorAndAdventure",
-    totalSpend: 0,
-    fill: "var(--color-OutdoorAndAdventure)",
-  },
-  {
-    category: "PharmaciesAndWellbeing",
-    totalSpend: 0,
-    fill: "var(--color-PharmaciesAndWellbeing)",
-  },
-  {
-    category: "TravelAndHolidays",
-    totalSpend: 0,
-    fill: "var(--color-TravelAndHolidays)",
-  },
-  {
-    category: "Other",
-    totalSpend: 80,
-    fill: "var(--color-Other)",
-  },
-];
-
-export function aggregateTopCategories(data: ChartData[]): ChartData[] {
-  const aggregated = data.reduce<Record<string, ChartData>>((acc, curr) => {
+export function aggregateTopCategories(data: pieChart[]): pieChart[] {
+  const aggregated = data.reduce<Record<string, pieChart>>((acc, curr) => {
     if (!acc[curr.category]) {
       acc[curr.category] = { ...curr };
     } else {
@@ -170,7 +52,7 @@ export function aggregateTopCategories(data: ChartData[]): ChartData[] {
   return top4;
 }
 
-const chartData3 = aggregateTopCategories(chartData2);
+const chartData = aggregateTopCategories(pieChartData);
 
 const chartConfig = {
   totalSpend: {
@@ -260,7 +142,7 @@ export function ChartPieSeparatorNone() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData3}
+              data={chartData}
               dataKey="totalSpend"
               nameKey="category"
               stroke="0"
