@@ -3,7 +3,7 @@ using Clerk.Net.AspNetCore.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// origin:
+// origin
 builder.Services.AddCors(opts =>
 {
   opts.AddPolicy("frontend", p =>
@@ -12,7 +12,7 @@ builder.Services.AddCors(opts =>
      .AllowAnyMethod());
 });
 
-//  Clerk authentication:
+//  Clerk authentication
 builder.Services.AddAuthentication(ClerkAuthenticationDefaults.AuthenticationScheme)
   .AddClerkAuthentication(x =>
   {
