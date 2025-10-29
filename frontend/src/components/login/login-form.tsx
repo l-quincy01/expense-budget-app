@@ -58,9 +58,8 @@ export function LoginForm({
       const res = await signIn!.create({ identifier: email, password });
       if (res.status === "complete") {
         await setActiveFromSignIn!({ session: res.createdSessionId });
-        router.push("/dashboard"); // or your (auth) landing
+        router.push("/dashboard");
       } else {
-        // If your project requires a 2nd factor / email code for sign-in, handle here.
         setError("Additional verification required.");
       }
     } catch (err: any) {
@@ -76,7 +75,6 @@ export function LoginForm({
     setSubmitting(true);
     setError(null);
     try {
-      // Create sign-up (first/last name optional in Clerk settings)
       await signUp!.create({
         emailAddress: email,
         password,
@@ -84,7 +82,6 @@ export function LoginForm({
         lastName,
       });
 
-      // Send email verification code (default Clerk behavior)
       await signUp!.prepareEmailAddressVerification({ strategy: "email_code" });
       setMode("verify");
     } catch (err: any) {
@@ -120,7 +117,7 @@ export function LoginForm({
     if (!ready || !signIn) return;
     try {
       await signIn.authenticateWithRedirect({
-        strategy, // "oauth_google" | "oauth_apple"
+        strategy,
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       });

@@ -2,7 +2,7 @@
 import React from "react";
 import { SimpleHeader } from "./simple-header";
 import { useUser } from "@clerk/nextjs";
-import { SiteHeader } from "../site-header";
+import { SiteHeader } from "./site-header";
 
 export default function Header() {
   const { isSignedIn } = useUser();
