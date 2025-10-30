@@ -1,7 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Clerk.Net.AspNetCore.Security;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApplicationDbContext>(opt =>
+  opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 // origin
 builder.Services.AddCors(opts =>
@@ -43,3 +53,6 @@ app.MapGet("/api/profile", (HttpContext ctx) =>
 });
 
 app.Run();
+
+
+/*postgresql://postgres:admin@localhost:5432/BudgetAppDB*/
