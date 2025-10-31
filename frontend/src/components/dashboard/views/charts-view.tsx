@@ -7,11 +7,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChartLineLinear } from "@/components/charts/chart-line-linear";
-import { ChartPieSeparatorNone } from "@/components/charts/chart-pie-separator-none";
+// import { ChartPieSeparatorNone } from "@/components/charts/chart-pie-separator-none";
 import { ChartLineMultiple } from "@/components/charts/chart-line-multiple";
 
 import { LayoutGrid } from "lucide-react";
-import { ChartLineMultipleCategories } from "../charts/chart-line-multiple-categories";
+import { ChartLineMultipleCategories } from "../../charts/chart-line-multiple-categories";
 
 export default function ChartsView() {
   const [chartView, setChartView] = useState("trends");
@@ -62,7 +62,7 @@ export default function ChartsView() {
         {chartView === "categories" && (
           <>
             <ChartLineMultipleCategories />
-            <ChartPieSeparatorNone />
+            {/* <ChartPieSeparatorNone /> */}
           </>
         )}
       </div>

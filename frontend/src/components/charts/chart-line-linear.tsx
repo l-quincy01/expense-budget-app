@@ -32,9 +32,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
-import { transactionsLedger } from "@/types/data";
+import { userMonthlyTransactionsData } from "@/types/data";
 
-const chartData = transactionsLedger.flatMap((m) =>
+const chartData = userMonthlyTransactionsData.flatMap((m) =>
   m.transactions.map((t) => ({
     month: m.month,
     day: t.day,
@@ -83,9 +83,6 @@ export function ChartLineLinear() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="linear">Linear</SelectItem>
-              {/* Removed due to misalignment */}
-              {/* <SelectItem value="natural">Natural</SelectItem> */}
-
               <SelectItem value="step">Step</SelectItem>
               <SelectItem value="barChart">Bar</SelectItem>
             </SelectContent>

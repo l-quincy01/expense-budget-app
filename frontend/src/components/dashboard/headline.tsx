@@ -1,12 +1,19 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BanknoteArrowDown, BanknoteArrowUp, Wallet } from "lucide-react";
+import { useOverview } from "@/hooks/useOverview";
+import { useProfile } from "@/hooks/useProfile";
 
 export default function Headline() {
+  const { data, loading, error } = useProfile();
+
+  if (loading) return <div>Loading...</div>;
+  if (error || !data) return <div>Failed to load profile</div>;
+
   return (
     <div className="space-y-2">
       <div className="flex flex-col gap-2 justify-start">
-        <div className="text-4xl font-bold">Hi Tebogo</div>
+        <div className="text-4xl font-bold">Hi {data.firstName}</div>
         <div className="text-lg text-muted-foreground">
           Here&apos;s what&apos;s happening with your money. Let&apos;s manage
           your expense.

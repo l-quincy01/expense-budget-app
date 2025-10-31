@@ -1,6 +1,11 @@
 "use client";
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
+import {
+  IconArticle,
+  IconCirclePlusFilled,
+  IconMail,
+  type Icon,
+} from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,15 +18,17 @@ import {
 } from "@/components/ui/sidebar";
 import AddDashboard from "./dialogs/add-dashboard";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon?: Icon;
-  }[];
-}) {
+export function NavMain() {
+  const sidebarData = {
+    navMain: [
+      {
+        title: "September Budget",
+        url: "#",
+        icon: IconArticle,
+      },
+    ],
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -33,7 +40,7 @@ export function NavMain({
         <SidebarGroup>
           <SidebarGroupLabel className="">Dashboards</SidebarGroupLabel>
           <SidebarMenu>
-            {items.map((item) => (
+            {sidebarData.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}

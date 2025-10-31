@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Clerk.BackendAPI" Version="0.13.0" />
+    <PackageReference Include="Clerk.Net" Version="1.15.0" />
     <PackageReference Include="Clerk.Net.AspNetCore.Security" Version="1.0.0" />
+    <PackageReference Include="Clerk.Net.DependencyInjection" Version="1.15.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

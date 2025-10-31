@@ -1,45 +1,93 @@
-using Microsoft.AspNetCore.Authorization;
-using Clerk.Net.AspNetCore.Security;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Clerk.BackendAPI;
+using Clerk.BackendAPI.Helpers.Jwks;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// origin:
+// CORS 
 builder.Services.AddCors(opts =>
 {
   opts.AddPolicy("frontend", p =>
-    p.WithOrigins("http://localhost:3000")
-     .AllowAnyHeader()
-     .AllowAnyMethod());
+      p.WithOrigins("http://localhost:3000")
+       .AllowAnyHeader()
+       .AllowAnyMethod()
+       .AllowCredentials());
 });
 
-//  Clerk authentication:
-builder.Services.AddAuthentication(ClerkAuthenticationDefaults.AuthenticationScheme)
-  .AddClerkAuthentication(x =>
-  {
-
-    x.Authority = builder.Configuration["Clerk:Authority"]!;
-
-    x.AuthorizedParty = builder.Configuration["Clerk:AuthorizedParty"]!;
-  });
-
-builder.Services.AddAuthorizationBuilder()
-  .SetFallbackPolicy(new AuthorizationPolicyBuilder()
-    .RequireAuthenticatedUser()
-    .Build());
+//   Clerk Backend with Secret Key
+builder.Services.AddSingleton(_ =>
+    new ClerkBackendApi(bearerAuth: builder.Configuration["Clerk:SecretKey"]!));
 
 var app = builder.Build();
 
 app.UseCors("frontend");
-app.UseAuthentication();
-app.UseAuthorization();
+
 
 app.MapGet("/api/health", () => new { ok = true });
 
-app.MapGet("/api/profile", (HttpContext ctx) =>
+// Helper to convert HttpContext -> HttpRequestMessage for Clerk's authenticate helper
+static HttpRequestMessage ToHttpRequestMessage(HttpContext ctx)
 {
-  var userId = ctx.User.FindFirst("sub")?.Value
-           ?? ctx.User.FindFirst("user_id")?.Value;
-  return Results.Ok(new { userId, hello = "secured world" });
+  var req = new HttpRequestMessage(new HttpMethod(ctx.Request.Method), ctx.Request.GetDisplayUrl());
+
+  foreach (var (key, value) in ctx.Request.Headers)
+  {
+
+    if (!req.Headers.TryAddWithoutValidation(key, (IEnumerable<string>)value))
+    {
+
+      if (ctx.Request.ContentLength is > 0)
+      {
+        req.Content ??= new StreamContent(ctx.Request.Body);
+        req.Content.Headers.TryAddWithoutValidation(key, value.ToArray());
+      }
+    }
+  }
+
+  return req;
+}
+
+// Profile for user info from clerk
+app.MapGet("/api/profile", async (HttpContext ctx, ClerkBackendApi clerk) =>
+{
+  var cfg = ctx.RequestServices.GetRequiredService<IConfiguration>();
+  var options = new AuthenticateRequestOptions(
+      secretKey: cfg["Clerk:SecretKey"]!,
+      authorizedParties: new[] { cfg["Clerk:AuthorizedParty"]! }
+  );
+
+
+  var state = await AuthenticateRequest.AuthenticateRequestAsync(ctx.Request, options);
+  if (!state.IsAuthenticated) return Results.Unauthorized();
+
+
+
+
+  var authHeader = ctx.Request.Headers.Authorization.ToString();
+  if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+    return Results.Unauthorized();
+
+  var token = authHeader["Bearer ".Length..];
+  var jwt = new JsonWebToken(token);
+  var userId = jwt.Subject;
+
+  var user = await clerk.Users.GetAsync(userId: userId);
+
+  var primaryEmailId = user.User.PrimaryEmailAddressId;
+  var email = user.User.EmailAddresses?.FirstOrDefault(e => e.Id == primaryEmailId)?.EmailAddressValue
+              ?? user.User.EmailAddresses?.FirstOrDefault()?.EmailAddressValue
+              ?? "unknown";
+
+  return Results.Ok(new
+  {
+    userId,
+    email,
+    firstName = user.User.FirstName ?? "User",
+    lastName = user.User.LastName ?? ""
+  });
 });
 
 app.Run();

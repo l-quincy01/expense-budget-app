@@ -1,24 +1,30 @@
+"use client";
 import { useAuth } from "@clerk/nextjs";
+import { useCallback } from "react";
 
 export function useApi() {
   const { getToken } = useAuth();
-  return async function fetchApi<T>(
-    path: string,
-    init: RequestInit = {}
-  ): Promise<T> {
-    const token = await getToken();
-    // console.log("-------");
-    // console.log(process.env.NEXT_PUBLIC_API_BASE);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}${path}`, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...(init.headers || {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    return res.json();
-  };
+
+  const fetchApi = useCallback(
+    async function fetchApi<T>(
+      path: string,
+      init: RequestInit = {}
+    ): Promise<T> {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}${path}`, {
+        ...init,
+        headers: {
+          "Content-Type": "application/json",
+          ...(init.headers || {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      return res.json();
+    },
+    [getToken]
+  );
+
+  return fetchApi;
 }

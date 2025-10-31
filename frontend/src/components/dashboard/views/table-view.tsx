@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import AddTransactionDialog from "../table/Dialog/add-transaction-dialog";
-import SimpleTableManual from "../table/simple-table-manual";
+import AddTransactionDialog from "../../table/Dialog/add-transaction-dialog";
+import SimpleTableManual from "../../table/simple-table-manual";
 import {
   Select,
   SelectContent,
@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { StatementTable } from "../table/statement-table";
+import { StatementTable } from "../../table/statement-table";
 
 export default function TableView() {
   const [tableView, setTableView] = useState("categoryTable");

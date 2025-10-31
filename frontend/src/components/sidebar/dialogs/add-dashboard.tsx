@@ -34,9 +34,9 @@ export default function AddDashboard() {
         <Input id="dashboard-name" placeholder="Dashboard Name" type="text" />
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="fileUpload">Upload Statement</Label>
+          <Label htmlFor="fileUpload">Bank Statement</Label>
           <div id="fileUpload" className="border rounded-xl">
-            <FileUpload onChange={handleFileUpload} />
+            <Input type="file" onChange={() => handleFileUpload} />
           </div>
         </div>
       </DialogContent>

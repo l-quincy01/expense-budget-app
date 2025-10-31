@@ -1,4 +1,86 @@
 "use client";
+/*
+import {
+  ShoppingBag,
+  Bus,
+  Coffee,
+  Fuel,
+  ShoppingCart,
+  Briefcase,
+  Car,
+  HeartHandshake,
+  Gift,
+  Gamepad2,
+  Home,
+  Music,
+  Mountain,
+  Pill,
+  Plane,
+  MoreHorizontal,
+  LucideIcon,
+} from "lucide-react";
+
+export type categories =
+  | "GeneralRetail"
+  | "Transport"
+  | "EatingOutAndTreats"
+  | "Fuel"
+  | "Groceries"
+  | "ProfessionalServices"
+  | "CarUseAndServices"
+  | "DonationsAndGiving"
+  | "GiftsAndFlowers"
+  | "Hobbies"
+  | "HomewareAndAppliances"
+  | "MusicGamingApps"
+  | "OutdoorAndAdventure"
+  | "PharmaciesAndWellbeing"
+  | "TravelAndHolidays"
+  | "Other";
+
+export const categoryIcons: Record<categories, LucideIcon> = {
+  GeneralRetail: ShoppingBag,
+  Transport: Bus,
+  EatingOutAndTreats: Coffee,
+  Fuel: Fuel,
+  Groceries: ShoppingCart,
+  ProfessionalServices: Briefcase,
+  CarUseAndServices: Car,
+  DonationsAndGiving: HeartHandshake,
+  GiftsAndFlowers: Gift,
+  Hobbies: Gamepad2,
+  HomewareAndAppliances: Home,
+  MusicGamingApps: Music,
+  OutdoorAndAdventure: Mountain,
+  PharmaciesAndWellbeing: Pill,
+  TravelAndHolidays: Plane,
+  Other: MoreHorizontal,
+};
+
+
+export interface budgets {
+  category: categories;
+  budgetAmount: number;
+  spentAmount: number;
+  remainingAmount?: number;
+}
+
+
+export interface userMonthlyTransactions {
+  month: string;
+  transactions: { day: string; amount: number }[];
+}
+export interface userMonthlyIncomeExpenseTransactions {
+  month: string;
+  transactions: { day: string; income: number; expense: number }[];
+}
+export interface userMonthlyCategoryExpenditure {
+  month: string;
+  category: string | categories;
+  totalSpend: number;
+}
+
+*/
 
 import { useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
@@ -22,8 +104,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories, categoryMonthlyAggregate } from "@/types/types";
-import { monthlyCategoryAggregate } from "@/types/data";
+import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
+import { userMonthlyCategoryExpenditureData } from "@/types/data";
 
 const MONTH_INDEX: Record<string, number> = {
   January: 1,
@@ -45,7 +127,7 @@ function prettyLabel(cat: string) {
 }
 
 function getTopCategories(
-  data: categoryMonthlyAggregate[],
+  data: userMonthlyCategoryExpenditure[],
   topN = 4
 ): categories[] {
   const totals = new Map<categories, number>();
@@ -59,7 +141,10 @@ function getTopCategories(
     .map(([cat]) => cat);
 }
 
-function buildSeries(data: categoryMonthlyAggregate[], topCats: categories[]) {
+function buildSeries(
+  data: userMonthlyCategoryExpenditure[],
+  topCats: categories[]
+) {
   const months = [...new Set<string>(data.map((d) => d.month))].sort(
     (a, b) => MONTH_INDEX[a] - MONTH_INDEX[b]
   );
@@ -106,8 +191,8 @@ export function ChartLineMultipleCategories() {
   const [curve, setCurve] = useState<"linear" | "natural" | "step">("linear");
 
   const { topCats, chartData, chartConfig } = useMemo(() => {
-    const topCats = getTopCategories(monthlyCategoryAggregate, 4);
-    const chartData = buildSeries(monthlyCategoryAggregate, topCats);
+    const topCats = getTopCategories(userMonthlyCategoryExpenditureData, 4);
+    const chartData = buildSeries(userMonthlyCategoryExpenditureData, topCats);
     const chartConfig = buildChartConfig(topCats) satisfies ChartConfig;
     return { topCats, chartData, chartConfig };
   }, []);
@@ -126,8 +211,7 @@ export function ChartLineMultipleCategories() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="linear">Linear</SelectItem>
-            {/* <SelectItem value="natural">Natural</SelectItem> */}
-            {/* Removed due to misalignment */}
+
             <SelectItem value="step">Step</SelectItem>
           </SelectContent>
         </Select>

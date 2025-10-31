@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/select";
 import { ArrowDownWideNarrow, TriangleAlert, Utensils } from "lucide-react";
 
-import { Progress } from "../ui/progress";
+import { Progress } from "../../ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import AddBudgetDialog from "./Dialogs/add-budget-dialog";
-import EditBudgetDialog from "./Dialogs/edit-budget-dialog";
-import DeleteBudget from "./Dialogs/delete-budget";
-import InfoBudgetView from "./Dialogs/info-budgetView";
-import { Button } from "../ui/button";
+import AddBudgetDialog from "../dialogs/add-budget-dialog";
+import EditBudgetDialog from "../dialogs/edit-budget-dialog";
+import DeleteBudget from "../dialogs/delete-budget";
+import InfoBudgetView from "../dialogs/info-budgetView";
+import { Button } from "../../ui/button";
 import { budgets, categories, categoryIcons } from "@/types/types";
 import { userBudgets } from "@/types/data";
 import {

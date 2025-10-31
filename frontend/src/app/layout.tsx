@@ -6,8 +6,8 @@ import "./globals.css";
 
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import { ClerkProvider, useUser } from "@clerk/nextjs";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { ClerkProvider } from "@clerk/nextjs";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 
 const geistSans = Geist({
@@ -66,14 +66,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-
-/*
-       <div className="max-w-md  sm:max-w-[620px] md:lg:max-w-[720px] @max-[896px]:max-w-[860px] lg:max-w-[1000px]    2xl:max-w-[1080px]   mx-auto px">
-                <Header />
-                {children}
-
-                <Footer />
-              </div>
-
-
-*/

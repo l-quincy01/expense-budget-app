@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { incomeExpenseLedger } from "@/types/data";
+import { userMonthlyIncomeExpenseTransactionsData } from "@/types/data";
 
 export const description = "A multiple line/area/bar chart with controls";
 
@@ -77,7 +77,7 @@ const MONTH_INDEX: Record<string, number> = {
 const STARTING_BALANCE = 4347.7; //<----- MUST CHANGE
 
 const chartData = (() => {
-  const flat = incomeExpenseLedger.flatMap((m) =>
+  const flat = userMonthlyIncomeExpenseTransactionsData.flatMap((m) =>
     m.transactions.map((t) => ({
       month: m.month,
       day: t.day,
@@ -131,8 +131,7 @@ export function ChartLineMultiple() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="linear">Linear</SelectItem>
-              {/* <SelectItem value="natural">Natural</SelectItem> */}
-              {/* Removed due to misalignment */}
+
               <SelectItem value="step">Step</SelectItem>
               <SelectItem value="barMultiple">Bar Multiple</SelectItem>
             </SelectContent>
