@@ -5,7 +5,6 @@ import { IconArticle } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
 
-import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -16,21 +15,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useUser } from "@clerk/nextjs";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "September Budget",
-      url: "#",
-      icon: IconArticle,
-    },
-  ],
-};
+import { useProfile } from "@/hooks/useProfile";
+import { NavUser } from "./nav-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isSignedIn } = useUser();
@@ -54,10 +40,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarHeader>
           <SidebarContent>
-            <NavMain items={data.navMain} />
+            <NavMain />
           </SidebarContent>
           <SidebarFooter>
-            <NavUser user={data.user} />
+            <NavUser />
           </SidebarFooter>
         </Sidebar>
       )}

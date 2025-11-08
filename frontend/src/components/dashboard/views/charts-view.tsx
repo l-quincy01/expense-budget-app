@@ -7,13 +7,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChartLineLinear } from "@/components/charts/chart-line-linear";
-import { ChartPieSeparatorNone } from "@/components/charts/chart-pie-separator-none";
+
 import { ChartLineMultiple } from "@/components/charts/chart-line-multiple";
 
 import { LayoutGrid } from "lucide-react";
-import { ChartLineMultipleCategories } from "../charts/chart-line-multiple-categories";
+import { ChartLineMultipleCategories } from "../../charts/chart-line-multiple-categories";
+import {
+  userMonthlyCategoryExpenditure,
+  userMonthlyIncomeExpenseTransactions,
+  userMonthlyTransactions,
+} from "@/types/types";
 
-export default function ChartsView() {
+type ChartsViewProps = {
+  monthlyTransactions?: userMonthlyTransactions[];
+  monthlyIncomeExpenseTransactions?: userMonthlyIncomeExpenseTransactions[];
+  monthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];
+};
+
+export default function ChartsView({
+  monthlyTransactions = [],
+  monthlyIncomeExpenseTransactions = [],
+  monthlyCategoryExpenditure = [],
+}: ChartsViewProps) {
   const [chartView, setChartView] = useState("trends");
   const [gridlayout, setGridlayout] = useState(false);
 
@@ -50,19 +65,26 @@ export default function ChartsView() {
       </div>
 
       {/* Trends Charts */}
-      <div className={`grid grid-cols-${gridlayout ? "2" : "1"} gap-4`}>
-        {" "}
+      <div
+        className={`grid ${gridlayout ? "grid-cols-2" : "grid-cols-1"} gap-4`}
+      >
         {chartView === "trends" && (
           <>
-            <ChartLineLinear />
-            <ChartLineMultiple />
+            <ChartLineLinear monthlyTransactions={monthlyTransactions} />
+            <ChartLineMultiple
+              monthlyIncomeExpenseTransactions={
+                monthlyIncomeExpenseTransactions
+              }
+            />
           </>
         )}
         {/* Categories  Charts */}
         {chartView === "categories" && (
           <>
-            <ChartLineMultipleCategories />
-            <ChartPieSeparatorNone />
+            <ChartLineMultipleCategories
+              monthlyCategoryExpenditure={monthlyCategoryExpenditure}
+            />
+            {/* <ChartPieSeparatorNone /> */}
           </>
         )}
       </div>

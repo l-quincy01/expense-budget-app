@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/nextjs";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher([
@@ -9,6 +10,14 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const { userId } = await auth();
+  const url = new URL(req.url);
+
+  if (userId && isPublicRoute(req)) {
+    url.pathname = "/dashboard";
+    return Response.redirect(url);
+  }
+
   if (!isPublicRoute(req)) {
     const home = new URL("/", req.url).toString();
     await auth.protect({
