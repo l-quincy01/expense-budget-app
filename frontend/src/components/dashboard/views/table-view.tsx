@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import AddTransactionDialog from "../table/Dialog/add-transaction-dialog";
-import SimpleTableManual from "../table/simple-table-manual";
+import AddTransactionDialog from "../../table/Dialog/add-transaction-dialog";
+import SimpleTableManual from "../../table/simple-table-manual";
 import {
   Select,
   SelectContent,
@@ -9,9 +9,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { StatementTable } from "../table/statement-table";
+import { StatementTable } from "../../table/statement-table";
+import {
+  userMonthlyCategoryExpenditure,
+  userMonthlyTransactions,
+} from "@/types/types";
 
-export default function TableView() {
+type TableViewProps = {
+  monthlyTransactions?: userMonthlyTransactions[];
+  monthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];
+};
+
+export default function TableView({
+  monthlyTransactions = [],
+  monthlyCategoryExpenditure = [],
+}: TableViewProps) {
   const [tableView, setTableView] = useState("categoryTable");
 
   return (
@@ -37,8 +49,14 @@ export default function TableView() {
             </Select>
             <AddTransactionDialog />
           </div>
-          {tableView === "statementTable" && <StatementTable />}
-          {tableView === "categoryTable" && <SimpleTableManual />}
+          {tableView === "statementTable" && (
+            <StatementTable monthlyTransactions={monthlyTransactions} />
+          )}
+          {tableView === "categoryTable" && (
+            <SimpleTableManual
+              monthlyCategoryExpenditure={monthlyCategoryExpenditure}
+            />
+          )}
         </div>
       </div>
     </div>

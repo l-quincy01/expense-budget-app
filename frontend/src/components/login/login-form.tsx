@@ -24,7 +24,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
 
-  // Clerk headless hooks
+  // Clerk  hooks
   const {
     isLoaded: signInLoaded,
     signIn,
@@ -54,7 +54,6 @@ export function LoginForm({
     setSubmitting(true);
     setError(null);
     try {
-      // Email + Password sign-in
       const res = await signIn!.create({ identifier: email, password });
       if (res.status === "complete") {
         await setActiveFromSignIn!({ session: res.createdSessionId });
@@ -301,7 +300,6 @@ export function LoginForm({
               variant="outline"
               onClick={() => startOAuth("oauth_apple" as OAuthStrategy)}
             >
-              {/* Apple icon omitted for brevity */}
               Continue with Apple
             </Button>
             <Button
@@ -309,7 +307,6 @@ export function LoginForm({
               variant="outline"
               onClick={() => startOAuth("oauth_google" as OAuthStrategy)}
             >
-              {/* Google icon omitted for brevity */}
               Continue with Google
             </Button>
           </Field>

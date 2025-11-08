@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
   Card,
@@ -22,8 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories, categoryMonthlyAggregate } from "@/types/types";
-import { monthlyCategoryAggregate } from "@/types/data";
+import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
 
 const MONTH_INDEX: Record<string, number> = {
   January: 1,
@@ -38,20 +37,58 @@ const MONTH_INDEX: Record<string, number> = {
   October: 10,
   November: 11,
   December: 12,
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May2: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
 };
+
+MONTH_INDEX["May"] = 5;
+
+const ABBR_TO_FULL: Record<string, string> = {
+  Jan: "January",
+  Feb: "February",
+  Mar: "March",
+  Apr: "April",
+  May: "May",
+  Jun: "June",
+  Jul: "July",
+  Aug: "August",
+  Sep: "September",
+  Oct: "October",
+  Nov: "November",
+  Dec: "December",
+};
+
+function normalizeMonth(m: string) {
+  if (MONTH_INDEX[m] != null) return m;
+  const abbr = (m || "").slice(0, 3);
+  return ABBR_TO_FULL[abbr] ?? m;
+}
 
 function prettyLabel(cat: string) {
   return cat.replace(/([a-z])([A-Z])/g, "$1 $2").replaceAll("And", "&");
 }
 
 function getTopCategories(
-  data: categoryMonthlyAggregate[],
+  data: userMonthlyCategoryExpenditure[],
   topN = 4
 ): categories[] {
   const totals = new Map<categories, number>();
   for (const r of data) {
     if (r.category === "Other") continue;
-    totals.set(r.category, (totals.get(r.category) ?? 0) + r.totalSpend);
+    totals.set(
+      r.category as categories,
+      (totals.get(r.category as categories) ?? 0) + r.totalSpend
+    );
   }
   return [...totals.entries()]
     .sort((a, b) => b[1] - a[1])
@@ -59,17 +96,23 @@ function getTopCategories(
     .map(([cat]) => cat);
 }
 
-function buildSeries(data: categoryMonthlyAggregate[], topCats: categories[]) {
-  const months = [...new Set<string>(data.map((d) => d.month))].sort(
-    (a, b) => MONTH_INDEX[a] - MONTH_INDEX[b]
-  );
+function buildSeries(
+  data: userMonthlyCategoryExpenditure[],
+  topCats: categories[]
+) {
+  const months = [
+    ...new Set<string>(data.map((d) => normalizeMonth(d.month))),
+  ].sort((a, b) => (MONTH_INDEX[a] ?? 99) - (MONTH_INDEX[b] ?? 99));
 
   const key = (m: string, c: categories) => `${m}__${c}`;
   const index = new Map<string, number>();
+
   for (const r of data) {
+    const m = normalizeMonth(r.month);
+    const c = r.category as categories;
     index.set(
-      key(r.month, r.category),
-      (index.get(key(r.month, r.category)) ?? 0) + r.totalSpend
+      key(m, c),
+      (index.get(key(m, c)) ?? 0) + Number(r.totalSpend ?? 0)
     );
   }
 
@@ -78,7 +121,6 @@ function buildSeries(data: categoryMonthlyAggregate[], topCats: categories[]) {
     for (const c of topCats) {
       row[c] = Number(index.get(key(m, c)) ?? 0);
     }
-
     row.totalSpend = [...index.keys()]
       .filter((k) => k.startsWith(`${m}__`))
       .reduce((sum, k) => sum + (index.get(k) ?? 0), 0);
@@ -97,20 +139,35 @@ function buildChartConfig(topCats: categories[]): ChartConfig {
   topCats.forEach((cat, i) => {
     cfg[cat] = { label: prettyLabel(cat), color: palette[i % palette.length] };
   });
-
   cfg["totalSpend"] = { label: "Total (month)", color: "transparent" };
   return cfg as ChartConfig;
 }
 
-export function ChartLineMultipleCategories() {
+type ChartLineMultipleCategoriesProps = {
+  monthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];
+};
+
+export function ChartLineMultipleCategories({
+  monthlyCategoryExpenditure = [],
+}: ChartLineMultipleCategoriesProps) {
   const [curve, setCurve] = useState<"linear" | "natural" | "step">("linear");
 
-  const { topCats, chartData, chartConfig } = useMemo(() => {
-    const topCats = getTopCategories(monthlyCategoryAggregate, 4);
-    const chartData = buildSeries(monthlyCategoryAggregate, topCats);
-    const chartConfig = buildChartConfig(topCats) satisfies ChartConfig;
-    return { topCats, chartData, chartConfig };
-  }, []);
+  const { chartData, chartConfig } = useMemo(() => {
+    if (
+      !monthlyCategoryExpenditure ||
+      monthlyCategoryExpenditure.length === 0
+    ) {
+      return {
+        topCats: [] as categories[],
+        chartData: [] as Record<string, number | string>[],
+        chartConfig: buildChartConfig([]) as ChartConfig,
+      };
+    }
+    const top = getTopCategories(monthlyCategoryExpenditure, 4);
+    const data = buildSeries(monthlyCategoryExpenditure, top);
+    const cfg = buildChartConfig(top) as ChartConfig;
+    return { chartData: data, chartConfig: cfg };
+  }, [monthlyCategoryExpenditure]);
 
   return (
     <Card className="w-full">
@@ -126,54 +183,61 @@ export function ChartLineMultipleCategories() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="linear">Linear</SelectItem>
-            {/* <SelectItem value="natural">Natural</SelectItem> */}
-            {/* Removed due to misalignment */}
+            <SelectItem value="natural">Natural</SelectItem>
             <SelectItem value="step">Step</SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
 
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            data={chartData}
-            accessibilityLayer
-            margin={{ left: 12, right: 12 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent labelFormatter={(label) => `${label}`} />
-              }
-            />
-
-            {Object.keys(chartConfig)
-              .filter((k) => k !== "totalSpend")
-              .map((catKey) => (
-                <Line
-                  key={catKey}
-                  type={curve}
-                  dataKey={catKey}
-                  name={
-                    chartConfig[catKey as keyof ChartConfig]?.label as string
-                  }
-                  stroke={`var(--color-${catKey})`}
-                  strokeWidth={2.5}
-                  dot={{
-                    fill: `var(--color-${catKey})`,
-                  }}
-                  activeDot={{ r: 6 }}
-                />
-              ))}
-          </LineChart>
-        </ChartContainer>
+        {chartData.length === 0 ? (
+          <div className="text-sm text-muted-foreground">
+            No category data found yet.
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            <LineChart
+              data={chartData}
+              accessibilityLayer
+              margin={{ left: 12, right: 12 }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent labelFormatter={(label) => `${label}`} />
+                }
+              />
+              {Object.keys(chartConfig)
+                .filter((k) => k !== "totalSpend")
+                .map((catKey) => {
+                  const configEntry =
+                    chartConfig[catKey as keyof ChartConfig] ?? {};
+                  const color =
+                    (configEntry as { color?: string }).color ??
+                    "var(--chart-1)";
+                  return (
+                    <Line
+                      key={catKey}
+                      type={curve}
+                      dataKey={catKey}
+                      name={(configEntry as { label?: string }).label ?? catKey}
+                      stroke={color}
+                      strokeWidth={2.5}
+                      dot={{ fill: color }}
+                      activeDot={{ r: 6 }}
+                    />
+                  );
+                })}
+            </LineChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );

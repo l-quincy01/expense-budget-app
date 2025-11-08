@@ -18,6 +18,15 @@ import {
   LucideIcon,
 } from "lucide-react";
 
+/*----------------- */
+export type Profile = {
+  userId: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+/*----------------- */
 export type categories =
   | "GeneralRetail"
   | "Transport"
@@ -55,43 +64,53 @@ export const categoryIcons: Record<categories, LucideIcon> = {
   Other: MoreHorizontal,
 };
 
+/* Interfaces ---------------------------------- */
+
+/* User generated data */
+export interface overview {
+  moneyIn: number;
+  moneyOut: number;
+  month: string;
+  startingBalance: number;
+  totalBudget?: number;
+}
+
 export interface budgets {
   category: categories;
   budgetAmount: number;
   spentAmount: number;
-  remainingAmount?: number;
 }
 
-export interface chartLineLinearData {
+/* Auto  data */
+export interface userMonthlyTransactions {
   month: string;
   transactions: { day: string; amount: number }[];
 }
-export interface charLinetMultipleData {
+export interface userMonthlyIncomeExpenseTransactions {
   month: string;
+  startingBalance: number;
   transactions: { day: string; income: number; expense: number }[];
 }
-export interface charLinetMultipleCategoriesData {
-  month: string;
-  category: string;
-  totalSpend: number;
-}
-
-export type categoryMonthlyAggregate = {
-  month: string;
-  category: categories;
-
-  totalSpend: number;
-};
-
-export interface pieChart {
-  category: categories;
-  totalSpend: number;
-  fill: string;
-}
-
-export interface pieChart2 {
+export interface userMonthlyCategoryExpenditure {
   month: string;
   category: categories;
   totalSpend: number;
-  fill: string;
 }
+
+/*
+Dashboard
+*/
+
+export interface dashboard {
+  userId: string;
+  name: string;
+  overview: overview[];
+  budgets?: budgets | budgets[] | null;
+  userMonthlyTransactions?: userMonthlyTransactions[];
+  userMonthlyIncomeExpenseTransactions?: userMonthlyIncomeExpenseTransactions[];
+  userMonthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/* */

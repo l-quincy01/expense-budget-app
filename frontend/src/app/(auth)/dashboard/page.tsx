@@ -1,27 +1,34 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useEffect, useState } from "react";
-import { useApi } from "@/lib/api";
 
-import Headline from "@/components/dashboard/headline";
-import BudgetView from "@/components/dashboard/budget-view";
-import ChartsView from "@/components/dashboard/charts-view";
-import TableView from "@/components/dashboard/table-view";
+import { useEffect } from "react";
+import useDashboard from "@/hooks/useDashboard";
+import { useRouter } from "next/navigation";
 
-export default function Dashboard() {
-  const api = useApi();
-  const [, setMe] = useState<any>(null);
+export default function DashboardLanding() {
+  const router = useRouter();
+  const { userDashboardNames, loading, error } = useDashboard();
 
   useEffect(() => {
-    api("/api/profile").then(setMe).catch(console.error);
-  }, [api]);
+    if (!loading && !error && userDashboardNames.length > 0) {
+      router.replace(
+        `/dashboard/${encodeURIComponent(userDashboardNames[0])}`
+      );
+    }
+  }, [userDashboardNames, loading, error, router]);
+
+  if (error) {
+    return (
+      <div className="px-6 py-8 text-red-500">
+        Failed to load dashboards: {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-8 px-16">
-      <Headline />
-      <BudgetView />
-      <ChartsView />
-      <TableView />
+    <div className="px-6 py-8 text-muted-foreground">
+      {loading
+        ? "Loading your dashboards..."
+        : "Select a dashboard from the sidebar or create a new one to get started."}
     </div>
   );
 }
