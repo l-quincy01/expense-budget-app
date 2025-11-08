@@ -3,14 +3,13 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BudgetlyAI.Models;
 
-public class IncomeExpense
+public class DailyTransaction
 {
     public string Day { get; set; } = null!;
-    public double Income { get; set; }
-    public double Expense { get; set; }
+    public double Amount { get; set; }
 }
 
-public class UserMonthlyIncomeExpense
+public class UserMonthlyTransaction
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -18,5 +17,7 @@ public class UserMonthlyIncomeExpense
 
     public string UserId { get; set; } = null!;
     public string Month { get; set; } = null!;
-    public List<IncomeExpense> Transactions { get; set; } = new();
+    public List<DailyTransaction> Transactions { get; set; } = new();
+    [BsonElement("DashboardName")]
+    public string? DashboardName { get; set; }
 }

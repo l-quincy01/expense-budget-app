@@ -32,24 +32,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
-import { userMonthlyTransactionsData } from "@/types/data";
+import { userMonthlyTransactions } from "@/types/types";
 
-const chartData = userMonthlyTransactionsData.flatMap((m) =>
-  m.transactions.map((t) => ({
-    month: m.month,
-    day: t.day,
-    amount: t.amount,
-  }))
-);
+type ChartLineLinearProps = {
+  monthlyTransactions?: userMonthlyTransactions[];
+};
 
-const chartConfig = {
-  amount: {
-    label: "Amount ",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig;
-
-export function ChartLineLinear() {
+export function ChartLineLinear({
+  monthlyTransactions = [],
+}: ChartLineLinearProps) {
   const [chartType, setChartType] = useState("linear");
   const [areaChart, setAreaChart] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -68,6 +59,21 @@ export function ChartLineLinear() {
         </CardHeader>
       </Card>
     );
+
+  const chartData = monthlyTransactions.flatMap((m) =>
+    (m.transactions ?? []).map((t) => ({
+      month: m.month,
+      day: t.day,
+      amount: t.amount,
+    }))
+  );
+
+  const chartConfig = {
+    amount: {
+      label: "Amount ",
+      color: "var(--chart-1)",
+    },
+  } satisfies ChartConfig;
 
   return (
     <Card className="w-full">
@@ -100,66 +106,72 @@ export function ChartLineLinear() {
       </CardHeader>
 
       <CardContent>
-        <ChartContainer config={chartConfig} className="w-full">
-          {chartType === "barChart" ? (
-            <BarChart data={chartData} margin={{ left: 12, right: 12 }}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Bar dataKey="amount" fill="var(--color-amount)" radius={8} />
-            </BarChart>
-          ) : areaChart ? (
-            <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="line" />}
-              />
-              <Area
-                dataKey="amount"
-                type={chartType}
-                fill="var(--color-amount)"
-                fillOpacity={0.4}
-                stroke="var(--color-amount)"
-              />
-            </AreaChart>
-          ) : (
-            <LineChart data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Line
-                dataKey="amount"
-                type={chartType}
-                stroke="var(--color-amount)"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          )}
-        </ChartContainer>
+        {chartData.length === 0 ? (
+          <div className="text-sm text-muted-foreground">
+            No transaction data available for this dashboard yet.
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig} className="w-full">
+            {chartType === "barChart" ? (
+              <BarChart data={chartData} margin={{ left: 12, right: 12 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar dataKey="amount" fill="var(--color-amount)" radius={8} />
+              </BarChart>
+            ) : areaChart ? (
+              <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="line" />}
+                />
+                <Area
+                  dataKey="amount"
+                  type={chartType}
+                  fill="var(--color-amount)"
+                  fillOpacity={0.4}
+                  stroke="var(--color-amount)"
+                />
+              </AreaChart>
+            ) : (
+              <LineChart data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={(d) => `${d.month.slice(0, 3)} ${d.day}`}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Line
+                  dataKey="amount"
+                  type={chartType}
+                  stroke="var(--color-amount)"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            )}
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );

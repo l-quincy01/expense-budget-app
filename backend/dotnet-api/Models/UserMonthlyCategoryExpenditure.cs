@@ -13,4 +13,6 @@ public class UserMonthlyCategoryExpenditure
     public string Month { get; set; } = null!;
     public string Category { get; set; } = null!;
     public double TotalSpend { get; set; }
+    [BsonElement("DashboardName")]
+    public string? DashboardName { get; set; }
 }

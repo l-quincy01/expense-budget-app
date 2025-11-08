@@ -32,7 +32,6 @@ export function NavUser() {
 
   const { signOut } = useClerk();
 
-  // const { isSignedIn } = useUser();
   const { data, loading, error } = useProfile();
 
   if (loading) return <div>Loading...</div>;
@@ -86,13 +85,3 @@ export function NavUser() {
     </SidebarMenu>
   );
 }
-
-/*
-
-     <Button
-                  variant="outline"
-                  onClick={() => signOut({ redirectUrl: "/login" })}
-                >
-                  Logout
-                </Button>
-*/

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  IconArticle,
-  IconCirclePlusFilled,
-  IconMail,
-  type Icon,
-} from "@tabler/icons-react";
-
-import { Button } from "@/components/ui/button";
+import { IconArticle } from "@tabler/icons-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -17,17 +10,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import AddDashboard from "./dialogs/add-dashboard";
+import useDashboard from "@/hooks/useDashboard";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function NavMain() {
-  const sidebarData = {
-    navMain: [
-      {
-        title: "September Budget",
-        url: "#",
-        icon: IconArticle,
-      },
-    ],
-  };
+  const { userDashboardNames, loading, error, selectedDashboardName } =
+    useDashboard();
+  const pathname = usePathname();
 
   return (
     <SidebarGroup>
@@ -40,14 +30,50 @@ export function NavMain() {
         <SidebarGroup>
           <SidebarGroupLabel className="">Dashboards</SidebarGroupLabel>
           <SidebarMenu>
-            {sidebarData.navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+            {loading && (
+              <SidebarMenuItem>
+                <SidebarMenuButton disabled>
+                  <IconArticle />
+                  <span>Loading dashboards…</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            ))}
+            )}
+            {error && !loading && (
+              <SidebarMenuItem>
+                <SidebarMenuButton disabled>
+                  <IconArticle />
+                  <span>{error}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+            {!loading && !error && userDashboardNames.length === 0 && (
+              <SidebarMenuItem>
+                <SidebarMenuButton disabled>
+                  <IconArticle />
+                  <span>No dashboards yet</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+            {userDashboardNames.map((name) => {
+              const encoded = encodeURIComponent(name);
+              const isActive =
+                pathname === `/dashboard/${encoded}` ||
+                selectedDashboardName === name;
+              return (
+                <SidebarMenuItem key={name}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={name}
+                    isActive={isActive}
+                  >
+                    <Link href={`/dashboard/${encoded}`}>
+                      <IconArticle />
+                      <span>{name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarGroupContent>

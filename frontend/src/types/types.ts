@@ -67,19 +67,28 @@ export const categoryIcons: Record<categories, LucideIcon> = {
 /* Interfaces ---------------------------------- */
 
 /* User generated data */
+export interface overview {
+  moneyIn: number;
+  moneyOut: number;
+  month: string;
+  startingBalance: number;
+  totalBudget?: number;
+}
+
 export interface budgets {
   category: categories;
   budgetAmount: number;
   spentAmount: number;
 }
 
-/* Auto generated data */
+/* Auto  data */
 export interface userMonthlyTransactions {
   month: string;
   transactions: { day: string; amount: number }[];
 }
 export interface userMonthlyIncomeExpenseTransactions {
   month: string;
+  startingBalance: number;
   transactions: { day: string; income: number; expense: number }[];
 }
 export interface userMonthlyCategoryExpenditure {
@@ -87,3 +96,21 @@ export interface userMonthlyCategoryExpenditure {
   category: categories;
   totalSpend: number;
 }
+
+/*
+Dashboard
+*/
+
+export interface dashboard {
+  userId: string;
+  name: string;
+  overview: overview[];
+  budgets?: budgets | budgets[] | null;
+  userMonthlyTransactions?: userMonthlyTransactions[];
+  userMonthlyIncomeExpenseTransactions?: userMonthlyIncomeExpenseTransactions[];
+  userMonthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/* */
