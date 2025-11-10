@@ -65,38 +65,15 @@ export function ChartLineMultiple({
     },
   } satisfies ChartConfig;
 
-  const MONTH_INDEX: Record<string, number> = {
-    January: 1,
-    February: 2,
-    March: 3,
-    April: 4,
-    May: 5,
-    June: 6,
-    July: 7,
-    August: 8,
-    September: 9,
-    October: 10,
-    November: 11,
-    December: 12,
-  };
-
   const chartData = (() => {
-    const monthOrder = (month: string) => MONTH_INDEX[month] ?? 99;
-
-    const normalizedBlocks = monthlyIncomeExpenseTransactions
-      .map((block) => ({
-        month: block.month,
-        startingBalance: block.startingBalance,
-        transactions: [...(block.transactions ?? [])].sort(
-          (a, b) => Number(a.day) - Number(b.day)
-        ),
-      }))
-      .sort((a, b) => {
-        const ma = monthOrder(a.month);
-        const mb = monthOrder(b.month);
-        if (ma !== mb) return ma - mb;
-        return 0;
-      });
+    // Go through months exactly as given
+    const normalizedBlocks = monthlyIncomeExpenseTransactions.map((block) => ({
+      month: block.month,
+      startingBalance: block.startingBalance,
+      transactions: [...(block.transactions ?? [])].sort(
+        (a, b) => Number(a.day) - Number(b.day)
+      ),
+    }));
 
     return normalizedBlocks.flatMap((block) => {
       let running = block.startingBalance;

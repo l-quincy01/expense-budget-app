@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -15,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 
+import { toast } from "sonner";
+
 type IngestResult = {
   userId: string;
   month: string;
@@ -25,9 +28,9 @@ type IngestResult = {
 
 export default function AddDashboard() {
   const { isSignedIn, userId, getToken } = useAuth();
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [dashboardName, setDashboardName] = useState("");
-  const [month, setMonth] = useState(""); // e.g. "October"
+  const [month, setMonth] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,24 +39,68 @@ export default function AddDashboard() {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null;
-    setFile(f);
+    const selected = e.target.files ? Array.from(e.target.files) : [];
+    setFiles(selected);
   };
+
+  // const onSubmit = async () => {
+  //   try {
+  //     setError(null);
+  //     if (!isSignedIn) return setError("Sign in to upload a statement.");
+  //     if (!files) return setError("Please select a PDF bank statement.");
+
+  //     const token = await getToken();
+  //     if (!token) throw new Error("No Clerk token available.");
+
+  //     const form = new FormData();
+  //     form.append("dashboardName", dashboardName);
+  //     files.forEach((file) => {
+  //       form.append("pdfs", file, file.name);
+  //     });
+
+  //     setIsUploading(true);
+  //     const res = await fetch(`${apiBase}/api/dashboard/create`, {
+  //       method: "POST",
+  //       headers: { Authorization: `Bearer ${token}` },
+  //       body: form,
+  //     });
+
+  //     if (!res.ok) throw new Error(await res.text());
+
+  //     const data = await res.json();
+  //     setResult(data.nodeResponse || data);
+  //     setFiles([]);
+  //     setDashboardName("");
+  //     setIsOpen(false);
+  //   } catch (err: any) {
+  //     setError(err.message || "Upload failed.");
+  //   } finally {
+  //     setIsUploading(false);
+  //   }
+  // };
 
   const onSubmit = async () => {
     try {
       setError(null);
       if (!isSignedIn) return setError("Sign in to upload a statement.");
-      if (!file) return setError("Please select a PDF bank statement.");
+      if (!files) return setError("Please select a PDF bank statement.");
 
       const token = await getToken();
       if (!token) throw new Error("No Clerk token available.");
 
       const form = new FormData();
       form.append("dashboardName", dashboardName);
-      form.append("pdfs", file, file.name);
+      files.forEach((file) => {
+        form.append("pdfs", file, file.name);
+      });
 
       setIsUploading(true);
+
+      let uploadToastId: string | number | undefined;
+      uploadToastId = toast.loading(
+        "Uploading and processing your statement(s)…"
+      );
+
       const res = await fetch(`${apiBase}/api/dashboard/create`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -64,12 +111,33 @@ export default function AddDashboard() {
 
       const data = await res.json();
       setResult(data.nodeResponse || data);
-      setFile(null);
+      setFiles([]);
       setDashboardName("");
-      // setMonth("");
       setIsOpen(false);
+
+      if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
+      toast.success(`Dashboard "${dashboardName}" created.`, {
+        description:
+          (data?.nodeResponse?.transactionsInserted ??
+            data?.transactionsInserted) != null
+            ? `${
+                (data.nodeResponse || data).transactionsInserted
+              } transactions ingested.`
+            : undefined,
+        action: {
+          label: "View",
+          onClick: () => {
+            window.location.href = `/dashboard/${encodeURIComponent(
+              dashboardName
+            )}`;
+          },
+        },
+      });
     } catch (err: any) {
-      setError(err.message || "Upload failed.");
+      const msg = err?.message || "Upload failed.";
+      setError(msg);
+
+      toast.error(msg);
     } finally {
       setIsUploading(false);
     }
@@ -110,6 +178,7 @@ export default function AddDashboard() {
               id="fileUpload"
               type="file"
               accept="application/pdf"
+              multiple
               onChange={onFileChange}
             />
 
@@ -118,7 +187,7 @@ export default function AddDashboard() {
                 variant="outline"
                 onClick={() => {
                   setError(null);
-                  setFile(null);
+                  setFiles([]);
                   setDashboardName("");
                   setMonth("");
                 }}

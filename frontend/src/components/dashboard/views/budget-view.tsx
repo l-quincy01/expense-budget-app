@@ -77,7 +77,7 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
             <AddBudgetDialog />
           </div>
 
-          <div
+          {/* <div
             className={`hover:bg-accent p-2 rounded-full ${
               true ? "bg-transparent" : "bg-accent"
             }`}
@@ -85,7 +85,7 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
             <Button size="icon" variant="ghost">
               <ArrowDownWideNarrow />
             </Button>
-          </div>
+          </div> */}
           <div className={`hover:bg-accent p-2 rounded-full`}>
             <InfoBudgetView />
           </div>

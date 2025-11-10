@@ -9,6 +9,7 @@ import Footer from "@/components/footer/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,7 +57,7 @@ export default function RootLayout({
               <div className=" container mx-auto p-4">
                 <Header />
                 {children}
-
+                <Toaster />
                 <Footer />
               </div>
             </ThemeProvider>

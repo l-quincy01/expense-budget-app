@@ -1,41 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BanknoteArrowDown, BanknoteArrowUp, Wallet } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { overview as OverviewEntry } from "@/types/types";
+import { overview } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type HeadlineProps = {
-  overview?: OverviewEntry[];
+  overview?: overview[];
 };
 
 export default function Headline({ overview = [] }: HeadlineProps) {
   const { data, loading, error } = useProfile();
+  const [monthTab, setMonthTab] = useState<string | undefined>();
+  const [overviewEntries, setOverviewEntries] = useState<overview[]>([]);
 
-  const overviewEntries =
-    overview.length > 0
-      ? overview
-      : [
-          {
-            month: "Overview",
-            moneyIn: 0,
-            moneyOut: 0,
-            startingBalance: 0,
-            totalBudget: 0,
-          },
-        ];
-  const latestEntry = overviewEntries[overviewEntries.length - 1];
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-ZA", {
-      style: "currency",
-      currency: "ZAR",
-      maximumFractionDigits: 0,
-    }).format(value ?? 0);
+  useEffect(() => {
+    if (overview.length > 0) {
+      setOverviewEntries(overview);
+      setMonthTab(overview[0].month);
+    }
+  }, [overview]);
 
   if (loading) return <div>Loading profile…</div>;
   if (error || !data)
     return <div className="text-red-500">Failed to load profile</div>;
+
+  const currentOverview = overviewEntries.find((o) => o.month === monthTab);
 
   return (
     <div className="space-y-4">
@@ -47,26 +37,21 @@ export default function Headline({ overview = [] }: HeadlineProps) {
         </div>
       </div>
 
-      <Tabs
-        defaultValue={overviewEntries[0]?.month ?? "Overview"}
-        className="w-full md:w-[400px]"
-      >
-        <TabsList className="flex flex-wrap">
-          {overviewEntries.map((item) => (
-            <TabsTrigger key={item.month} value={item.month}>
-              July
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {overviewEntries.map((item) => (
-          <TabsContent key={item.month} value={item.month}>
-            <div className="text-sm text-muted-foreground">
-              Money in {formatCurrency(item.moneyIn)} • Money out{" "}
-              {formatCurrency(item.moneyOut)}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+      {overviewEntries.length > 0 && (
+        <Tabs
+          value={monthTab}
+          onValueChange={setMonthTab}
+          className="w-full md:w-[400px]"
+        >
+          <TabsList className="flex flex-wrap">
+            {overviewEntries.map((item) => (
+              <TabsTrigger key={item.month} value={item.month}>
+                {item.month}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 w-fit">
         <Card className="w-fit">
@@ -74,7 +59,7 @@ export default function Headline({ overview = [] }: HeadlineProps) {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-semibold">Money Out</p>
               <p className="font-bold text-2xl">
-                {formatCurrency(latestEntry.moneyOut)}
+                {currentOverview?.moneyOut ?? 0}
               </p>
             </div>
             <div className="p-4 rounded-full bg-accent">
@@ -82,12 +67,13 @@ export default function Headline({ overview = [] }: HeadlineProps) {
             </div>
           </CardContent>
         </Card>
+
         <Card className="w-fit">
           <CardContent className="flex flex-row gap-8 items-center justify-between w-fit ">
             <div className="flex flex-col gap-2">
               <p className="text-sm font-semibold">Money In</p>
               <p className="font-bold text-2xl">
-                {formatCurrency(latestEntry.moneyIn)}
+                {currentOverview?.moneyIn ?? 0}
               </p>
             </div>
             <div className="p-4 rounded-full bg-accent">
@@ -95,13 +81,12 @@ export default function Headline({ overview = [] }: HeadlineProps) {
             </div>
           </CardContent>
         </Card>
+
         <Card className="w-fit">
           <CardContent className="flex flex-row gap-8 items-center justify-between w-fit ">
             <div className="flex flex-col gap-2">
               <p className="text-sm font-semibold">Budget Set</p>
-              <p className="font-bold text-2xl">
-                {formatCurrency(latestEntry.totalBudget ?? 0)}
-              </p>
+              <p className="font-bold text-2xl">N/A</p>
             </div>
             <div className="p-4 rounded-full bg-accent">
               <Wallet size={28} />
