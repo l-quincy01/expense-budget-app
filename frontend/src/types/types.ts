@@ -76,9 +76,19 @@ export interface overview {
 }
 
 export interface budgets {
+  userId: string;
+  dashboardName: string;
   category: categories;
   budgetAmount: number;
   spentAmount: number;
+}
+
+export interface userAddedTransactions {
+  userId: string;
+  dashboardName: string;
+  date: string;
+  description: string;
+  amount: number;
 }
 
 /* Auto  data */

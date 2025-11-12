@@ -39,12 +39,6 @@ export default function DashboardDetailPage() {
     );
   }
 
-  const budgetsArray = Array.isArray(userDashboard.budgets)
-    ? userDashboard.budgets
-    : userDashboard.budgets
-    ? [userDashboard.budgets]
-    : [];
-
   console.log(
     "----",
     "\n",
@@ -56,7 +50,11 @@ export default function DashboardDetailPage() {
   return (
     <div className="flex flex-col gap-8 px-4 py-6 md:px-16">
       <Headline overview={userDashboard.overview ?? []} />
-      <BudgetView budgets={budgetsArray} />
+      <BudgetView
+        categoriesExpenditure={
+          userDashboard.userMonthlyCategoryExpenditure ?? []
+        }
+      />
       <ChartsView
         monthlyTransactions={userDashboard.userMonthlyTransactions ?? []}
         monthlyIncomeExpenseTransactions={

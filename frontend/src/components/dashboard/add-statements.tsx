@@ -10,13 +10,14 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { CopyPlus, LayoutDashboard } from "lucide-react";
+import { CopyPlus, FileText, LayoutDashboard, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 
 import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
 type IngestResult = {
   userId: string;
@@ -26,15 +27,17 @@ type IngestResult = {
   categoryRowsInserted: number;
 };
 
-export default function AddDashboard() {
+export default function AddStatement() {
   const { isSignedIn, userId, getToken } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
-  const [dashboardName, setDashboardName] = useState("");
-  const [month, setMonth] = useState("");
+
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<IngestResult | null>(null);
+
+  const params = useParams();
+  const dashboardName = params?.dashboardName as string;
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
 
@@ -42,42 +45,6 @@ export default function AddDashboard() {
     const selected = e.target.files ? Array.from(e.target.files) : [];
     setFiles(selected);
   };
-
-  // const onSubmit = async () => {
-  //   try {
-  //     setError(null);
-  //     if (!isSignedIn) return setError("Sign in to upload a statement.");
-  //     if (!files) return setError("Please select a PDF bank statement.");
-
-  //     const token = await getToken();
-  //     if (!token) throw new Error("No Clerk token available.");
-
-  //     const form = new FormData();
-  //     form.append("dashboardName", dashboardName);
-  //     files.forEach((file) => {
-  //       form.append("pdfs", file, file.name);
-  //     });
-
-  //     setIsUploading(true);
-  //     const res = await fetch(`${apiBase}/api/dashboard/create`, {
-  //       method: "POST",
-  //       headers: { Authorization: `Bearer ${token}` },
-  //       body: form,
-  //     });
-
-  //     if (!res.ok) throw new Error(await res.text());
-
-  //     const data = await res.json();
-  //     setResult(data.nodeResponse || data);
-  //     setFiles([]);
-  //     setDashboardName("");
-  //     setIsOpen(false);
-  //   } catch (err: any) {
-  //     setError(err.message || "Upload failed.");
-  //   } finally {
-  //     setIsUploading(false);
-  //   }
-  // };
 
   const onSubmit = async () => {
     try {
@@ -113,7 +80,7 @@ export default function AddDashboard() {
       const data = await res.json();
       setResult(data.nodeResponse || data);
       setFiles([]);
-      setDashboardName("");
+
       setIsOpen(false);
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
@@ -148,37 +115,34 @@ export default function AddDashboard() {
     <div className="space-y-4">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <button className="w-full">
-            <div className="flex flex-row items-center gap-2 p-2 bg-accent-foreground/90 hover:bg-accent-foreground/75 rounded-2xl cursor-pointer">
-              <CopyPlus className="text-accent" strokeWidth={1.5} />
-              <span className="text-accent">New Dashboard</span>
+          <button className="">
+            <div className="flex flex-row items-center gap-2 p-2 bg-accent-foreground/90 hover:bg-accent-foreground/75 rounded-lg cursor-pointer">
+              {/* <FileText className="text-accent" strokeWidth={1.5} /> */}
+              <Plus size={18} className="text-accent" />
+              {/* <span className="text-accent">Add </span> */}
             </div>
           </button>
         </DialogTrigger>
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Dashboard</DialogTitle>
+            <DialogTitle>
+              {" "}
+              Add statement for:
+              {dashboardName}
+            </DialogTitle>
             <DialogDescription>
-              Upload a bank statement PDF to build your dashboard.
+              Build your dashboard with more statements.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-2 ">
-            <Label htmlFor="dashboard-name">Dashboard Name</Label>
-            <Input
-              id="dashboard-name"
-              placeholder="My October Finances"
-              type="text"
-              value={dashboardName}
-              onChange={(e) => setDashboardName(e.target.value)}
-            />
-
             <Label htmlFor="fileUpload">Bank Statement (PDF)</Label>
             <Input
               id="fileUpload"
               type="file"
               accept="application/pdf"
+              multiple
               onChange={onFileChange}
             />
 
@@ -188,8 +152,6 @@ export default function AddDashboard() {
                 onClick={() => {
                   setError(null);
                   setFiles([]);
-                  setDashboardName("");
-                  setMonth("");
                 }}
               >
                 Reset

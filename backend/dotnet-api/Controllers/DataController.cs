@@ -7,7 +7,7 @@ using BudgetlyAI.Models;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // Clerk JWT required
+[Authorize]
 public class DataController : ControllerBase
 {
     private readonly MongoDbService _mongo;

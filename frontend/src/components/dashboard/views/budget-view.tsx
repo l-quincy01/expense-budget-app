@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   Select,
@@ -16,19 +16,37 @@ import EditBudgetDialog from "../dialogs/edit-budget-dialog";
 import DeleteBudget from "../dialogs/delete-budget";
 import InfoBudgetView from "../dialogs/info-budgetView";
 import { Button } from "../../ui/button";
-import { budgets, categories, categoryIcons } from "@/types/types";
-import { userBudgets } from "@/types/data";
+import {
+  budgets,
+  categories,
+  categoryIcons,
+  userMonthlyCategoryExpenditure,
+} from "@/types/types";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useApi } from "@/lib/api";
+import { useParams } from "next/navigation";
 
-type BudgetViewProps = {
-  budgets?: budgets[];
-};
+interface props {
+  categoriesExpenditure: userMonthlyCategoryExpenditure[];
+}
 
-export default function BudgetView({ budgets = [] }: BudgetViewProps) {
+/*----------- */
+
+export default function BudgetView({ categoriesExpenditure }: props) {
+  const params = useParams();
+
+  const dashboardName = params?.dashboardName as string;
+
+  const fetchApi = useApi();
+  const [userBudgets, setUserBudgets] = useState<budgets[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [budgetView, setBudgetView] = useState("topBudgets");
 
   const Icon = (category: categories | string) => {
@@ -41,10 +59,40 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
     return category.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
   }
 
-  const displayBudgets = useMemo(() => {
-    if (budgets.length === 0) return userBudgets;
-    return budgets;
-  }, [budgets]);
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        setLoading(true);
+        const query = dashboardName
+          ? `/api/budgets?dashboardName=${encodeURIComponent(dashboardName)}`
+          : `/api/budgets`;
+
+        const data = await fetchApi<budgets[]>(query);
+        if (mounted) setUserBudgets(data);
+      } catch (err: any) {
+        if (mounted) setError(err.message ?? "Failed to load budgets");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [fetchApi, dashboardName]);
+
+  if (loading) return <p>Loading budgets...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  function spentAmountMatcher(
+    categoryArr: userMonthlyCategoryExpenditure[],
+    categoryName: string
+  ): number {
+    const match = categoryArr.find((item) => item.category === categoryName);
+    return match?.totalSpend ?? 0;
+  }
 
   return (
     <div className="space-y-2">
@@ -74,18 +122,9 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
               true ? "bg-transparent" : "bg-accent"
             }`}
           >
-            <AddBudgetDialog />
+            <AddBudgetDialog dashboardName={dashboardName} />
           </div>
 
-          {/* <div
-            className={`hover:bg-accent p-2 rounded-full ${
-              true ? "bg-transparent" : "bg-accent"
-            }`}
-          >
-            <Button size="icon" variant="ghost">
-              <ArrowDownWideNarrow />
-            </Button>
-          </div> */}
           <div className={`hover:bg-accent p-2 rounded-full`}>
             <InfoBudgetView />
           </div>
@@ -94,12 +133,14 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 gap-4">
         {budgetView === "topBudgets" &&
-          [...displayBudgets]
+          [...userBudgets]
             .sort((a, b) => b.budgetAmount - a.budgetAmount)
             .slice(0, 6)
             .map((budget, index) => {
               const percentage =
-                (budget.spentAmount / budget.budgetAmount) * 100;
+                (spentAmountMatcher(categoriesExpenditure, budget.category) /
+                  budget.budgetAmount) *
+                100;
               return (
                 <Card className="py-2 px-0" key={index}>
                   <CardContent className="flex flex-col gap-0 w-full justify-center">
@@ -124,7 +165,13 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
 
                     <div className="flex flex-col gap-2 w-full my-4">
                       <div className="flex flex-row items-center w-full justify-between text-xs text-muted-foreground">
-                        <div>Spent: {budget.spentAmount}</div>
+                        <div>
+                          Spent:{" "}
+                          {spentAmountMatcher(
+                            categoriesExpenditure,
+                            budget.category
+                          )}
+                        </div>
                         <div>
                           Remaining:{" "}
                           {budget.budgetAmount - budget.spentAmount < 0 ? (
@@ -158,7 +205,7 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
               );
             })}
         {budgetView == "allBudgets" &&
-          displayBudgets.map((budget, index) => {
+          userBudgets.map((budget, index) => {
             const percentage = (budget.spentAmount / budget.budgetAmount) * 100;
             return (
               <Card className="py-2 px-0" key={index}>

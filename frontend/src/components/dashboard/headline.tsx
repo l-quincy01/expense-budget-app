@@ -4,6 +4,7 @@ import { BanknoteArrowDown, BanknoteArrowUp, Wallet } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { overview } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AddStatement from "./add-statements";
 
 type HeadlineProps = {
   overview?: overview[];
@@ -29,12 +30,15 @@ export default function Headline({ overview = [] }: HeadlineProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2 justify-start">
-        <div className="text-4xl font-bold">Hi {data.firstName}</div>
-        <div className="text-lg text-muted-foreground">
-          Here&apos;s what&apos;s happening with your money. Let&apos;s manage
-          your expense.
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col gap-2 justify-start">
+          <div className="text-4xl font-bold">Hi {data.firstName}</div>
+          <div className="text-lg text-muted-foreground">
+            Here&apos;s what&apos;s happening with your money. Let&apos;s manage
+            your expense.
+          </div>
         </div>
+        <AddStatement />
       </div>
 
       {overviewEntries.length > 0 && (
