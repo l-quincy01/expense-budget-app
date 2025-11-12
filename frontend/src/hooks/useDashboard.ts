@@ -2,6 +2,7 @@ import { useApi } from "@/lib/api";
 import { dashboard } from "@/types/types";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { sortDashboardMonths } from "@/utils/sortDashboard";
 
 export default function useDashboard(explicitName?: string) {
   const fetchApi = useApi();
@@ -61,13 +62,12 @@ export default function useDashboard(explicitName?: string) {
           `/api/dashboarddata/${encodeURIComponent(dashboardName)}`
         );
         if (!mounted) return;
-        setUserDashboard(dash);
+        setUserDashboard(sortDashboardMonths(dash));
+        console.log(userDashboard);
         setError(null);
       } catch (e) {
         if (mounted)
-          setError(
-            e instanceof Error ? e.message : "Failed to load dashboard"
-          );
+          setError(e instanceof Error ? e.message : "Failed to load dashboard");
       } finally {
         if (mounted) setDashboardLoading(false);
       }

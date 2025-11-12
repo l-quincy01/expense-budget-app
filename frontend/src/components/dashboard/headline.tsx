@@ -2,25 +2,27 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BanknoteArrowDown, BanknoteArrowUp, Wallet } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { overview } from "@/types/types";
+import { overview, userMonthlyIncomeExpenseTransactions } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddStatement from "./add-statements";
+import { calculateMonthlyTotals, monthlyTotals } from "@/utils/overviewHandler";
 
 type HeadlineProps = {
-  overview?: overview[];
+  headlineData: userMonthlyIncomeExpenseTransactions[];
 };
 
-export default function Headline({ overview = [] }: HeadlineProps) {
+export default function Headline({ headlineData = [] }: HeadlineProps) {
   const { data, loading, error } = useProfile();
   const [monthTab, setMonthTab] = useState<string | undefined>();
-  const [overviewEntries, setOverviewEntries] = useState<overview[]>([]);
+  const [overviewEntries, setOverviewEntries] = useState<monthlyTotals[]>([]);
 
   useEffect(() => {
-    if (overview.length > 0) {
-      setOverviewEntries(overview);
-      setMonthTab(overview[0].month);
+    if (headlineData.length > 0) {
+      setOverviewEntries(calculateMonthlyTotals(headlineData));
+
+      setMonthTab(calculateMonthlyTotals(headlineData)[0].month);
     }
-  }, [overview]);
+  }, [headlineData]);
 
   if (loading) return <div>Loading profile…</div>;
   if (error || !data)
@@ -48,8 +50,8 @@ export default function Headline({ overview = [] }: HeadlineProps) {
           className="w-full md:w-[400px]"
         >
           <TabsList className="flex flex-wrap">
-            {overviewEntries.map((item) => (
-              <TabsTrigger key={item.month} value={item.month}>
+            {overviewEntries.map((item, index) => (
+              <TabsTrigger key={index} value={item.month}>
                 {item.month}
               </TabsTrigger>
             ))}

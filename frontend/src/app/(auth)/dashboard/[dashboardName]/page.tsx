@@ -49,7 +49,9 @@ export default function DashboardDetailPage() {
 
   return (
     <div className="flex flex-col gap-8 px-4 py-6 md:px-16">
-      <Headline overview={userDashboard.overview ?? []} />
+      <Headline
+        headlineData={userDashboard.userMonthlyIncomeExpenseTransactions ?? []}
+      />
       <BudgetView
         categoriesExpenditure={
           userDashboard.userMonthlyCategoryExpenditure ?? []

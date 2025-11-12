@@ -69,7 +69,7 @@ export default function AddStatement() {
         "Uploading and processing your statement(s)…"
       );
 
-      const res = await fetch(`${apiBase}/api/dashboard/create`, {
+      const res = await fetch(`${apiBase}/api/dashboard/update`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: form,
@@ -84,7 +84,7 @@ export default function AddStatement() {
       setIsOpen(false);
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
-      toast.success(`Dashboard "${dashboardName}" created.`, {
+      toast.success(`Dashboard "${dashboardName}" updated.`, {
         description:
           (data?.nodeResponse?.transactionsInserted ??
             data?.transactionsInserted) != null
@@ -157,7 +157,7 @@ export default function AddStatement() {
                 Reset
               </Button>
               <Button onClick={onSubmit} disabled={isUploading || !isSignedIn}>
-                {isUploading ? "Uploading..." : "Create"}
+                {isUploading ? "Uploading..." : "Add"}
               </Button>
             </div>
           </div>

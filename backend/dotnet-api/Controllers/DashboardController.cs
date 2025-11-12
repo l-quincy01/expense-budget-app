@@ -69,4 +69,56 @@ public class DashboardController : ControllerBase
 
         return Ok(new { message = "Dashboard created & ingested", nodeResponse = body });
     }
+
+
+    [HttpPost("update")]
+    [RequestSizeLimit(200 * 1024 * 1024)]
+    public async Task<IActionResult> UpdateDashboard(
+        [FromForm] string dashboardName,
+        [FromForm] IFormFile[] pdfs,
+        CancellationToken ct)
+    {
+
+        var bearerToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var claims = new JwtSecurityTokenHandler().ReadJwtToken(bearerToken);
+        var userId = claims.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Invalid Clerk token");
+
+
+        if (string.IsNullOrWhiteSpace(dashboardName))
+            return BadRequest("dashboardName is required");
+
+        if (pdfs is null || pdfs.Length == 0)
+            return BadRequest("At least one PDF is required");
+
+
+        var client = _httpClientFactory.CreateClient("AiIngest");
+        var nodeUpdateUrl = _config["NodeIngest:UpdateUrl"] ?? "http://localhost:4010/api/update-dashboard";
+
+        using var form = new MultipartFormDataContent();
+        form.Add(new StringContent(dashboardName), "dashboardName");
+
+        foreach (var pdf in pdfs)
+        {
+            var stream = pdf.OpenReadStream();
+            var fileContent = new StreamContent(stream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+            form.Add(fileContent, "pdfs", pdf.FileName);
+        }
+
+
+        var req = new HttpRequestMessage(HttpMethod.Post, nodeUpdateUrl);
+        req.Content = form;
+        req.Headers.Add("x-user-id", userId);
+
+
+        var resp = await client.SendAsync(req, ct);
+        var body = await resp.Content.ReadAsStringAsync(ct);
+
+        if (!resp.IsSuccessStatusCode)
+            return StatusCode((int)resp.StatusCode, new { error = body });
+
+        return Ok(new { message = "Dashboard updated", nodeResponse = body });
+    }
 }
