@@ -70,6 +70,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
           : `/api/budgets`;
 
         const data = await fetchApi<budgets[]>(query);
+        console.log(categoriesExpenditure);
         if (mounted) setUserBudgets(data);
       } catch (err: any) {
         if (mounted) setError(err.message ?? "Failed to load budgets");
@@ -81,7 +82,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
     return () => {
       mounted = false;
     };
-  }, [fetchApi, dashboardName]);
+  }, [fetchApi, dashboardName, categoriesExpenditure]);
 
   if (loading) return <p>Loading budgets...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -90,8 +91,9 @@ export default function BudgetView({ categoriesExpenditure }: props) {
     categoryArr: userMonthlyCategoryExpenditure[],
     categoryName: string
   ): number {
-    const match = categoryArr.find((item) => item.category === categoryName);
-    return match?.totalSpend ?? 0;
+    return categoryArr
+      .filter((item) => item.category === categoryName)
+      .reduce((sum, item) => sum + item.totalSpend, 0);
   }
 
   return (
@@ -170,7 +172,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
                           {spentAmountMatcher(
                             categoriesExpenditure,
                             budget.category
-                          )}
+                          ).toFixed(2)}
                         </div>
                         <div>
                           Remaining:{" "}
