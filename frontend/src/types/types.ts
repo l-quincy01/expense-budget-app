@@ -123,4 +123,4 @@ export interface dashboard {
   updatedAt?: string;
 }
 
-/* */
+/*Local types */

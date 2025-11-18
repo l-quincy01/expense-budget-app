@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   Select,
@@ -7,15 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowDownWideNarrow, TriangleAlert, Utensils } from "lucide-react";
+import { TriangleAlert, Utensils } from "lucide-react";
 
 import { Progress } from "../../ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import AddBudgetDialog from "../dialogs/add-budget-dialog";
-import EditBudgetDialog from "../dialogs/edit-budget-dialog";
-import DeleteBudget from "../dialogs/delete-budget";
-import InfoBudgetView from "../dialogs/info-budgetView";
-import { Button } from "../../ui/button";
+import AddBudgetDialog from "../dialogs/budgets-dialogs/add-budget-dialog";
+import EditBudgetDialog from "../dialogs/budgets-dialogs/edit-budget-dialog";
+import DeleteBudget from "../dialogs/budgets-dialogs/delete-budget";
+import InfoBudgetView from "../dialogs/budgets-dialogs/info-budgetView";
 import {
   budgets,
   categories,
@@ -43,11 +43,19 @@ export default function BudgetView({ categoriesExpenditure }: props) {
   const dashboardName = params?.dashboardName as string;
 
   const fetchApi = useApi();
-  const [userBudgets, setUserBudgets] = useState<budgets[]>([]);
+  const [userBudgets, setUserBudgets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [budgetView, setBudgetView] = useState("topBudgets");
+  const isMountedRef = useRef(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const Icon = (category: categories | string) => {
     const iconKey = (category as categories) ?? "Other";
@@ -59,30 +67,29 @@ export default function BudgetView({ categoriesExpenditure }: props) {
     return category.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
   }
 
-  useEffect(() => {
-    let mounted = true;
+  const refreshBudgets = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const query = dashboardName
+        ? `/api/budgets?dashboardName=${encodeURIComponent(dashboardName)}`
+        : `/api/budgets`;
 
-    (async () => {
-      try {
-        setLoading(true);
-        const query = dashboardName
-          ? `/api/budgets?dashboardName=${encodeURIComponent(dashboardName)}`
-          : `/api/budgets`;
-
-        const data = await fetchApi<budgets[]>(query);
-        console.log(categoriesExpenditure);
-        if (mounted) setUserBudgets(data);
-      } catch (err: any) {
-        if (mounted) setError(err.message ?? "Failed to load budgets");
-      } finally {
-        if (mounted) setLoading(false);
+      const data = await fetchApi<any[]>(query);
+      if (isMountedRef.current) {
+        setUserBudgets(data);
       }
-    })();
+    } catch (err: any) {
+      if (isMountedRef.current)
+        setError(err.message ?? "Failed to load budgets");
+    } finally {
+      if (isMountedRef.current) setLoading(false);
+    }
+  }, [dashboardName, fetchApi]);
 
-    return () => {
-      mounted = false;
-    };
-  }, [fetchApi, dashboardName, categoriesExpenditure]);
+  useEffect(() => {
+    refreshBudgets();
+  }, [refreshBudgets]);
 
   if (loading) return <p>Loading budgets...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -147,8 +154,20 @@ export default function BudgetView({ categoriesExpenditure }: props) {
                 <Card className="py-2 px-0" key={index}>
                   <CardContent className="flex flex-col gap-0 w-full justify-center">
                     <div className="flex flex-row justify-end p-0 items-start">
-                      <DeleteBudget />
-                      <EditBudgetDialog />
+                      <DeleteBudget
+                        budgetID={budget.id}
+                        onDeleted={refreshBudgets}
+                      />
+                      <EditBudgetDialog
+                        budget={{
+                          id: budget.id,
+                          dashboardName: budget.dashboardName,
+                          category: budget.category,
+                          budgetAmount: budget.budgetAmount,
+                          spentAmount: budget.spentAmount,
+                        }}
+                        onBudgetUpdated={refreshBudgets}
+                      />
                     </div>
 
                     <div className="flex flex-row items-center gap-4 justify-between">
@@ -213,8 +232,20 @@ export default function BudgetView({ categoriesExpenditure }: props) {
               <Card className="py-2 px-0" key={index}>
                 <CardContent className="flex flex-col gap-0 w-full justify-center">
                   <div className="flex flex-row justify-end p-0 items-start">
-                    <DeleteBudget />
-                    <EditBudgetDialog />
+                    <DeleteBudget
+                      budgetID={budget.id}
+                      onDeleted={refreshBudgets}
+                    />
+                    <EditBudgetDialog
+                      budget={{
+                        id: budget.id,
+                        dashboardName: budget.dashboardName,
+                        category: budget.category,
+                        budgetAmount: budget.budgetAmount,
+                        spentAmount: budget.spentAmount,
+                      }}
+                      onBudgetUpdated={refreshBudgets}
+                    />
                   </div>
 
                   <div className="flex flex-row items-center gap-4 justify-between">

@@ -22,6 +22,7 @@ import {
 import { useApi } from "@/lib/api";
 import { categories, budgets } from "@/types/types";
 import { toast } from "sonner";
+import { prettyLabel } from "@/utils/labelPrettier";
 
 const CATEGORY_OPTIONS: categories[] = [
   "GeneralRetail",
@@ -41,9 +42,6 @@ const CATEGORY_OPTIONS: categories[] = [
   "TravelAndHolidays",
   "Other",
 ];
-
-const formatCategoryLabel = (value: string) =>
-  value.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
 
 type AddBudgetDialogProps = {
   dashboardName: string;
@@ -103,9 +101,7 @@ export default function AddBudgetDialog({
       setAmount("");
       setCategory("GeneralRetail");
       setIsOpen(false);
-      toast.success(
-        `Budget for ${formatCategoryLabel(created.category)} created.`
-      );
+      toast.success(`Budget for ${prettyLabel(created.category)} created.`);
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Failed to create the budget.";
@@ -144,7 +140,7 @@ export default function AddBudgetDialog({
                 <SelectContent id="view-selector-content">
                   {CATEGORY_OPTIONS.map((option) => (
                     <SelectItem key={option} value={option}>
-                      {formatCategoryLabel(option)}
+                      {prettyLabel(option)}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -23,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
+import { prettyLabel } from "@/utils/labelPrettier";
 
 const MONTH_INDEX: Record<string, number> = {
   January: 1,
@@ -72,10 +74,6 @@ function normalizeMonth(m: string) {
   if (MONTH_INDEX[m] != null) return m;
   const abbr = (m || "").slice(0, 3);
   return ABBR_TO_FULL[abbr] ?? m;
-}
-
-function prettyLabel(cat: string) {
-  return cat.replace(/([a-z])([A-Z])/g, "$1 $2").replaceAll("And", "&");
 }
 
 function getTopCategories(
@@ -147,7 +145,7 @@ type ChartLineMultipleCategoriesProps = {
   monthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];
 };
 
-export function ChartLineMultipleCategories({
+export function LineChartMultipleCategories({
   monthlyCategoryExpenditure = [],
 }: ChartLineMultipleCategoriesProps) {
   const [curve, setCurve] = useState<"linear" | "natural" | "step">("linear");
@@ -183,7 +181,7 @@ export function ChartLineMultipleCategories({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="linear">Linear</SelectItem>
-            <SelectItem value="natural">Natural</SelectItem>
+
             <SelectItem value="step">Step</SelectItem>
           </SelectContent>
         </Select>

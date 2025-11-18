@@ -4,7 +4,7 @@ import { BanknoteArrowDown, BanknoteArrowUp, Wallet } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { overview, userMonthlyIncomeExpenseTransactions } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddStatement from "./add-statements";
+import AddStatement from "./dialogs/statements-dialogs/add-statements";
 import { calculateMonthlyTotals, monthlyTotals } from "@/utils/overviewHandler";
 
 type HeadlineProps = {
