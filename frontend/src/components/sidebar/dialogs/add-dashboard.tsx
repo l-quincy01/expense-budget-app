@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
@@ -26,8 +27,13 @@ type IngestResult = {
   categoryRowsInserted: number;
 };
 
-export default function AddDashboard() {
+type AddDashboardProps = {
+  onCreated?: (dashboardName: string) => void | Promise<void>;
+};
+
+export default function AddDashboard({ onCreated }: AddDashboardProps) {
   const { isSignedIn, userId, getToken } = useAuth();
+  const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [dashboardName, setDashboardName] = useState("");
   const [month, setMonth] = useState("");
@@ -102,7 +108,9 @@ export default function AddDashboard() {
         "Uploading and processing your statement(s)…"
       );
 
-      const res = await fetch(`${apiBase}/api/dashboard/create`, {
+      console.log("FUCK HERE->", apiBase);
+
+      const res = await fetch(`${apiBase}/api/dashboard`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: form,
@@ -112,12 +120,16 @@ export default function AddDashboard() {
 
       const data = await res.json();
       setResult(data.nodeResponse || data);
+      const createdDashboardName = dashboardName;
       setFiles([]);
       setDashboardName("");
       setIsOpen(false);
 
+      await onCreated?.(createdDashboardName);
+      router.refresh();
+
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
-      toast.success(`Dashboard "${dashboardName}" created.`, {
+      toast.success(`Dashboard "${createdDashboardName}" created.`, {
         description:
           (data?.nodeResponse?.transactionsInserted ??
             data?.transactionsInserted) != null
@@ -129,7 +141,7 @@ export default function AddDashboard() {
           label: "View",
           onClick: () => {
             window.location.href = `/dashboard/${encodeURIComponent(
-              dashboardName
+              createdDashboardName
             )}`;
           },
         },

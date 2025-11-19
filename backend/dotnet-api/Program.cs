@@ -111,6 +111,7 @@ var app = builder.Build();
 // Middleware
 
 app.UseCors("frontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
