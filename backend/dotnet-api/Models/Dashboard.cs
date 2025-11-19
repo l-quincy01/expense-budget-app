@@ -52,7 +52,7 @@ namespace BudgetlyAI.Models
 
 
         [BsonElement("month")]
-        public string Moonth { get; set; } = null!;
+        public string Month { get; set; } = null!;
 
         [BsonElement("startingBalance")]
         public double StartingBalance { get; set; }

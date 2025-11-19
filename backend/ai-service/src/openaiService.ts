@@ -99,7 +99,7 @@ async function callResponsesRaw(
   ];
 
   const resp = await client.responses.create({
-    model: "gpt-4o",
+    model: "chatgpt-4o-latest",
     temperature: 0,
     input: [{ role: "user", content }],
   });
@@ -150,11 +150,21 @@ function promptTransactionsRaw(userId: string) {
     ``,
     `Rules:`,
     ` All numbers must be written WITHOUT commas DO NOT INCLUDE THOUSANDS SEPARATORS (e.g., 4413.87 not 4,413.87). `,
-    `- Include ALL months present in the PDFs.`,
+    `- ALL TRANSACTIONS must be included do not omit ANY transactions`,
+    `- Include ALL months and dates/days EXACTLY as it is present in the PDFs.`,
+    `- Transactions must be in the CORRECT order, chronological order`,
     `- Use full month names like "September", "October".`,
-    `- Positive amounts = credits; negative amounts = debits.`,
+    `- Positive amounts = credits (marked by cr); negative amounts = debits.`,
     `- Day must be zero-padded "01".."31".`,
     `- Output must be valid JSON with ONLY the array.`,
+    `Data Structure ( YOUR OUTPUT must STRICTLY match this structure):`,
+    `
+    {
+    dashboardName: string;
+    month: string;
+    transactions: { day: string; amount: number }[];
+  }[]
+    `,
   ].join("\n");
 }
 
@@ -184,13 +194,26 @@ function promptIncomeExpenseRaw(userId: string) {
     `]`,
     ``,
     `Rules:`,
-    ` All numbers must be written WITHOUT commas DO NOT INCLUDE THOUSANDS SEPARATORS (e.g., 4413.87 not 4,413.87). `,
-    `- Include ALL months present in the PDFs.`,
-    `- "income" is the sum of credits for that day (>= 0).`,
-    `- "expense" is the sum of debits for that day (>= 0).`,
-    `- Day must be zero-padded "01".."31".`,
+    `- All numbers must be written WITHOUT commas DO NOT INCLUDE THOUSANDS SEPARATORS (e.g., 4413.87 not 4,413.87). `,
+    `- ALL TRANSACTIONS must be included do not omit ANY`,
+    `- Include ALL months and dates/days EXACTLY as it is present in the PDFs.`,
+    `- Transactions must be in the CORRECT order, chronological order`,
+    `- "income" is individual credit shown for that transaction (marked by cr) (>= 0).`,
+    `- "expense" is the individual debit for that transaction (>= 0).`,
+    `- Day must be zero-padded "01".."31" and must match exactly as it is in the document.`,
     `- "startingBalance": The balance at the start of the month (before that month’s first transaction).`,
     `- Output must be valid JSON with ONLY the array.`,
+
+    `Data Structure ( YOUR OUTPUT must STRICTLY match this structure):`,
+    `
+{
+    userId: string;
+    dashboardName: string;
+    month: string;
+    startingBalance: number;
+    transactions: { day: string; income: number; expense: number }[];
+  }[]
+    `,
   ].join("\n");
 }
 
@@ -204,20 +227,46 @@ function promptCategoriesRaw(userId: string) {
     `  { "month": "January",  "category": "Groceries",             "totalSpend": 520.35 },`,
     `  { "month": "January",  "category": "Transport",             "totalSpend": 240.5  },`,
     `  { "month": "January",  "category": "EatingOutAndTreats",    "totalSpend": 310.2  },`,
-    `  { "month": "February", "category": "GeneralRetail",         "totalSpend": 210.0  },`,
-    `  { "month": "February", "category": "Fuel",                  "totalSpend": 330.4  },`,
-    `  { "month": "February", "category": "ProfessionalServices",  "totalSpend": 90.0   },`,
-    `  { "month": "February", "category": "HomewareAndAppliances", "totalSpend": 150.0  },`,
-    `  { "month": "February", "category": "DonationsAndGiving",    "totalSpend": 50.0   }`,
+
     `]`,
     ``,
     `Rules:`,
     ` All numbers must be written WITHOUT commas DO NOT INCLUDE THOUSANDS SEPARATORS (e.g., 4413.87 not 4,413.87). `,
-    `- Return a FLAT array with one row per (month, category).`,
+    `- Return a flat array with one row per (month, category).`,
     `- "totalSpend" = sum of debits for that category in that month, as a positive number.`,
     `- Use the exact category taxonomy.`,
     `- Use full month names.`,
+    `- Choose the appropriate categories as per the description of the transaction.`,
+
     `- Output must be valid JSON with ONLY the array.`,
+
+    `Data Structure ( YOUR OUTPUT must STRICTLY match this structure):`,
+    `
+{
+    userId: string;
+    dashboardName: string;
+    month: string;
+    category:
+      | "GeneralRetail"
+      | "Transport"
+      | "EatingOutAndTreats"
+      | "Fuel"
+      | "Groceries"
+      | "ProfessionalServices"
+      | "CarUseAndServices"
+      | "DonationsAndGiving"
+      | "GiftsAndFlowers"
+      | "Hobbies"
+      | "HomewareAndAppliances"
+      | "MusicGamingApps"
+      | "OutdoorAndAdventure"
+      | "PharmaciesAndWellbeing"
+      | "TravelAndHolidays"
+      | "Other";
+    totalSpend: number;
+  }[];
+
+    `,
   ].join("\n");
 }
 
@@ -235,10 +284,9 @@ function promptOverviewRaw(userId: string) {
     `Definitions:`,
     `- "moneyIn": Total of all credits in that month.`,
     `- "moneyOut": Total of all debits in that month, as a positive number.`,
-    `- "startingBalance": The balance at the start of the month (before that month’s first transaction).`,
+    `- "startingBalance": The balance at the start of the month.`,
     `Rules:`,
     ` All numbers must be written WITHOUT commas DO NOT INCLUDE THOUSANDS SEPARATORS (e.g., 4413.87 not 4,413.87). `,
-    `- Include ALL months present in the PDFs.`,
     `- Use full month names.`,
     `- Output must be valid JSON with ONLY the array.`,
   ].join("\n");

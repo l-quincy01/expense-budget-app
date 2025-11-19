@@ -6,18 +6,39 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import AddDashboard from "./dialogs/add-dashboard";
 import useDashboard from "@/hooks/useDashboard";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import DeleteDashboard from "./dialogs/delete-dashboard";
 
 export function NavMain() {
-  const { userDashboardNames, loading, error, selectedDashboardName } =
-    useDashboard();
+  const {
+    userDashboardNames,
+    loading,
+    error,
+    selectedDashboardName,
+    refreshDashboardNames,
+  } = useDashboard();
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleDashboardDeleted = async (name: string) => {
+    const remaining = userDashboardNames.filter((dash) => dash !== name);
+    await refreshDashboardNames();
+    if (selectedDashboardName === name) {
+      const fallback = remaining[0];
+      if (fallback) {
+        router.push(`/dashboard/${encodeURIComponent(fallback)}`);
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  };
 
   return (
     <SidebarGroup>
@@ -61,14 +82,21 @@ export function NavMain() {
                 selectedDashboardName === name;
               return (
                 <SidebarMenuItem key={name}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={name}
-                    isActive={isActive}
-                  >
-                    <Link href={`/dashboard/${encoded}`}>
-                      <IconArticle />
-                      <span>{name}</span>
+                  <SidebarMenuButton asChild tooltip={name} isActive={isActive}>
+                    <Link
+                      className="flex flex-row justify-between items-center"
+                      href={`/dashboard/${encoded}`}
+                    >
+                      <div className="flex flex-row gap-2 items-center">
+                        <IconArticle size={16} />
+                        <span className=" line-clamp-1">{name}</span>
+                      </div>
+                      <SidebarMenuAction showOnHover>
+                        <DeleteDashboard
+                          dashboardName={name}
+                          onDeleted={() => handleDashboardDeleted(name)}
+                        />
+                      </SidebarMenuAction>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

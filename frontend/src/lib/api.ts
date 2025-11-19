@@ -21,7 +21,11 @@ export function useApi() {
         cache: "no-store",
       });
       if (!res.ok) throw new Error(`API ${res.status}`);
-      return res.json();
+      const text = await res.text();
+      if (!text) {
+        return undefined as T;
+      }
+      return JSON.parse(text) as T;
     },
     [getToken]
   );

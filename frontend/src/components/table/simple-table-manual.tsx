@@ -12,14 +12,11 @@ type SimpleTableManualProps = {
 export default function SimpleTableManual({
   monthlyCategoryExpenditure = [],
 }: SimpleTableManualProps) {
-  const totals = monthlyCategoryExpenditure.reduce(
-    (acc, row) => {
-      const key = row.category as categories;
-      acc[key] = (acc[key] ?? 0) + Number(row.totalSpend ?? 0);
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const totals = monthlyCategoryExpenditure.reduce((acc, row) => {
+    const key = row.category as categories;
+    acc[key] = (acc[key] ?? 0) + Number(row.totalSpend ?? 0);
+    return acc;
+  }, {} as Record<string, number>);
 
   const sorted = Object.entries(totals)
     .sort((a, b) => b[1] - a[1])
