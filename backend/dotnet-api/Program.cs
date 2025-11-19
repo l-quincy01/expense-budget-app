@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http.Features;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using BudgetlyAI.Data;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,8 +31,9 @@ builder.Services.Configure<FormOptions>(o =>
 // Controllers
 builder.Services.AddControllers();
 
-
-
+// Postgres
+builder.Services.AddDbContext<BudgetsDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("BudgetsDb")));
 
 // mongoDB
 builder.Services.AddSingleton<MongoDbService>();
@@ -38,7 +41,7 @@ builder.Services.AddSingleton<MongoDbService>();
 // ---
 builder.Services.AddAuthorization();
 builder.Services.AddHttpClient("AiIngest")
-    .ConfigureHttpClient(c => { c.Timeout = TimeSpan.FromMinutes(10); });
+    .ConfigureHttpClient(c => { c.Timeout = TimeSpan.FromMinutes(20); });
 
 builder.Services.AddHttpClient();
 

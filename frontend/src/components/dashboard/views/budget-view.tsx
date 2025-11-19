@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   Select,
@@ -7,29 +8,54 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowDownWideNarrow, TriangleAlert, Utensils } from "lucide-react";
+import { TriangleAlert, Utensils } from "lucide-react";
 
 import { Progress } from "../../ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import AddBudgetDialog from "../dialogs/add-budget-dialog";
-import EditBudgetDialog from "../dialogs/edit-budget-dialog";
-import DeleteBudget from "../dialogs/delete-budget";
-import InfoBudgetView from "../dialogs/info-budgetView";
-import { Button } from "../../ui/button";
-import { budgets, categories, categoryIcons } from "@/types/types";
-import { userBudgets } from "@/types/data";
+import AddBudgetDialog from "../dialogs/budgets-dialogs/add-budget-dialog";
+import EditBudgetDialog from "../dialogs/budgets-dialogs/edit-budget-dialog";
+import DeleteBudget from "../dialogs/budgets-dialogs/delete-budget";
+import InfoBudgetView from "../dialogs/budgets-dialogs/info-budgetView";
+import {
+  budgets,
+  categories,
+  categoryIcons,
+  userMonthlyCategoryExpenditure,
+} from "@/types/types";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useApi } from "@/lib/api";
+import { useParams } from "next/navigation";
 
-type BudgetViewProps = {
-  budgets?: budgets[];
-};
+interface props {
+  categoriesExpenditure: userMonthlyCategoryExpenditure[];
+}
 
-export default function BudgetView({ budgets = [] }: BudgetViewProps) {
+/*----------- */
+
+export default function BudgetView({ categoriesExpenditure }: props) {
+  const params = useParams();
+
+  const dashboardName = params?.dashboardName as string;
+
+  const fetchApi = useApi();
+  const [userBudgets, setUserBudgets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [budgetView, setBudgetView] = useState("topBudgets");
+  const isMountedRef = useRef(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const Icon = (category: categories | string) => {
     const iconKey = (category as categories) ?? "Other";
@@ -41,10 +67,41 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
     return category.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
   }
 
-  const displayBudgets = useMemo(() => {
-    if (budgets.length === 0) return userBudgets;
-    return budgets;
-  }, [budgets]);
+  const refreshBudgets = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const query = dashboardName
+        ? `/api/budgets?dashboardName=${encodeURIComponent(dashboardName)}`
+        : `/api/budgets`;
+
+      const data = await fetchApi<any[]>(query);
+      if (isMountedRef.current) {
+        setUserBudgets(data);
+      }
+    } catch (err: any) {
+      if (isMountedRef.current)
+        setError(err.message ?? "Failed to load budgets");
+    } finally {
+      if (isMountedRef.current) setLoading(false);
+    }
+  }, [dashboardName, fetchApi]);
+
+  useEffect(() => {
+    refreshBudgets();
+  }, [refreshBudgets]);
+
+  if (loading) return <p>Loading budgets...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  function spentAmountMatcher(
+    categoryArr: userMonthlyCategoryExpenditure[],
+    categoryName: string
+  ): number {
+    return categoryArr
+      .filter((item) => item.category === categoryName)
+      .reduce((sum, item) => sum + item.totalSpend, 0);
+  }
 
   return (
     <div className="space-y-2">
@@ -74,18 +131,9 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
               true ? "bg-transparent" : "bg-accent"
             }`}
           >
-            <AddBudgetDialog />
+            <AddBudgetDialog dashboardName={dashboardName} />
           </div>
 
-          <div
-            className={`hover:bg-accent p-2 rounded-full ${
-              true ? "bg-transparent" : "bg-accent"
-            }`}
-          >
-            <Button size="icon" variant="ghost">
-              <ArrowDownWideNarrow />
-            </Button>
-          </div>
           <div className={`hover:bg-accent p-2 rounded-full`}>
             <InfoBudgetView />
           </div>
@@ -94,18 +142,32 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 gap-4">
         {budgetView === "topBudgets" &&
-          [...displayBudgets]
+          [...userBudgets]
             .sort((a, b) => b.budgetAmount - a.budgetAmount)
             .slice(0, 6)
             .map((budget, index) => {
               const percentage =
-                (budget.spentAmount / budget.budgetAmount) * 100;
+                (spentAmountMatcher(categoriesExpenditure, budget.category) /
+                  budget.budgetAmount) *
+                100;
               return (
                 <Card className="py-2 px-0" key={index}>
                   <CardContent className="flex flex-col gap-0 w-full justify-center">
                     <div className="flex flex-row justify-end p-0 items-start">
-                      <DeleteBudget />
-                      <EditBudgetDialog />
+                      <DeleteBudget
+                        budgetID={budget.id}
+                        onDeleted={refreshBudgets}
+                      />
+                      <EditBudgetDialog
+                        budget={{
+                          id: budget.id,
+                          dashboardName: budget.dashboardName,
+                          category: budget.category,
+                          budgetAmount: budget.budgetAmount,
+                          spentAmount: budget.spentAmount,
+                        }}
+                        onBudgetUpdated={refreshBudgets}
+                      />
                     </div>
 
                     <div className="flex flex-row items-center gap-4 justify-between">
@@ -124,7 +186,13 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
 
                     <div className="flex flex-col gap-2 w-full my-4">
                       <div className="flex flex-row items-center w-full justify-between text-xs text-muted-foreground">
-                        <div>Spent: {budget.spentAmount}</div>
+                        <div>
+                          Spent:{" "}
+                          {spentAmountMatcher(
+                            categoriesExpenditure,
+                            budget.category
+                          ).toFixed(2)}
+                        </div>
                         <div>
                           Remaining:{" "}
                           {budget.budgetAmount - budget.spentAmount < 0 ? (
@@ -158,14 +226,26 @@ export default function BudgetView({ budgets = [] }: BudgetViewProps) {
               );
             })}
         {budgetView == "allBudgets" &&
-          displayBudgets.map((budget, index) => {
+          userBudgets.map((budget, index) => {
             const percentage = (budget.spentAmount / budget.budgetAmount) * 100;
             return (
               <Card className="py-2 px-0" key={index}>
                 <CardContent className="flex flex-col gap-0 w-full justify-center">
                   <div className="flex flex-row justify-end p-0 items-start">
-                    <DeleteBudget />
-                    <EditBudgetDialog />
+                    <DeleteBudget
+                      budgetID={budget.id}
+                      onDeleted={refreshBudgets}
+                    />
+                    <EditBudgetDialog
+                      budget={{
+                        id: budget.id,
+                        dashboardName: budget.dashboardName,
+                        category: budget.category,
+                        budgetAmount: budget.budgetAmount,
+                        spentAmount: budget.spentAmount,
+                      }}
+                      onBudgetUpdated={refreshBudgets}
+                    />
                   </div>
 
                   <div className="flex flex-row items-center gap-4 justify-between">

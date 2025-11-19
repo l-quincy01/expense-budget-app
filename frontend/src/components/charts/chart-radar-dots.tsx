@@ -21,7 +21,7 @@ import {
 export const description = "A radar chart with dots";
 
 const chartData = [
-  { month: "January", desktop: 186 },
+  { month: "January", desktop: 20 },
   { month: "February", desktop: 305 },
   { month: "March", desktop: 237 },
   { month: "April", desktop: 273 },
@@ -38,15 +38,18 @@ const chartConfig = {
 
 export function ChartRadarDots() {
   return (
-    <Card className="aspect-square bg-accent/20 border-[0.5px] px-1 ">
-      <CardHeader className="flex flex-col justify-center  px-4">
+    <Card>
+      <CardHeader className="items-center">
         <CardTitle>Radar Chart - Dots</CardTitle>
         <CardDescription>
           Showing total visitors for the last 6 months
         </CardDescription>
       </CardHeader>
-      <CardContent className="pb-0 px-0 w-full">
-        <ChartContainer config={chartConfig} className=" px-0">
+      <CardContent className="pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
           <RadarChart data={chartData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarAngleAxis dataKey="month" />
@@ -63,7 +66,14 @@ export function ChartRadarDots() {
           </RadarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm"></CardFooter>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="flex items-center gap-2 leading-none font-medium">
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="text-muted-foreground flex items-center gap-2 leading-none">
+          January - June 2024
+        </div>
+      </CardFooter>
     </Card>
   );
 }

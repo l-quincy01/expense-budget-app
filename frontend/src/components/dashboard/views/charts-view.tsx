@@ -6,17 +6,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChartLineLinear } from "@/components/charts/chart-line-linear";
+import { LineChartSpending } from "@/components/charts/spendingTrends/lineChartSpending";
 
-import { ChartLineMultiple } from "@/components/charts/chart-line-multiple";
+import { LineChartIncomeExpenseBalance } from "@/components/charts/spendingTrends/lineChartIncomeExpenseBalance";
 
 import { LayoutGrid } from "lucide-react";
-import { ChartLineMultipleCategories } from "../../charts/chart-line-multiple-categories";
+import { LineChartMultipleCategories } from "../../charts/spendingCategories/lineChartMultipleCategories";
 import {
   userMonthlyCategoryExpenditure,
   userMonthlyIncomeExpenseTransactions,
   userMonthlyTransactions,
 } from "@/types/types";
+import { RadarChartCategories } from "@/components/charts/spendingCategories/radarChartCategories";
+import { sumCategoriesForChart } from "@/utils/sumCategories";
+import { sumMonthsForChart } from "@/utils/sumMonths";
+import { BarchartIncomeExpense } from "@/components/charts/spendingTrends/barchartIncomeExpense";
+import { sumIncomeAndExpenses } from "@/utils/sumExpenses";
+import { PieChartCategories } from "@/components/charts/spendingCategories/pieChartCategories";
+import { BarChartCategories } from "@/components/charts/spendingCategories/barChartCategories";
 
 type ChartsViewProps = {
   monthlyTransactions?: userMonthlyTransactions[];
@@ -70,8 +77,13 @@ export default function ChartsView({
       >
         {chartView === "trends" && (
           <>
-            <ChartLineLinear monthlyTransactions={monthlyTransactions} />
-            <ChartLineMultiple
+            <BarchartIncomeExpense
+              incomeExpenseTotals={sumIncomeAndExpenses(
+                monthlyIncomeExpenseTransactions
+              )}
+            />
+            <LineChartSpending monthlyTransactions={monthlyTransactions} />
+            <LineChartIncomeExpenseBalance
               monthlyIncomeExpenseTransactions={
                 monthlyIncomeExpenseTransactions
               }
@@ -81,10 +93,21 @@ export default function ChartsView({
         {/* Categories  Charts */}
         {chartView === "categories" && (
           <>
-            <ChartLineMultipleCategories
+            <BarChartCategories
               monthlyCategoryExpenditure={monthlyCategoryExpenditure}
             />
-            {/* <ChartPieSeparatorNone /> */}
+            <PieChartCategories
+              monthlyCategoryExpenditure={monthlyCategoryExpenditure}
+            />
+            <RadarChartCategories
+              spendingCategories={sumCategoriesForChart(
+                monthlyCategoryExpenditure
+              )}
+              spendingMonths={sumMonthsForChart(monthlyCategoryExpenditure)}
+            />
+            <LineChartMultipleCategories
+              monthlyCategoryExpenditure={monthlyCategoryExpenditure}
+            />
           </>
         )}
       </div>

@@ -39,16 +39,16 @@ export default function DashboardDetailPage() {
     );
   }
 
-  const budgetsArray = Array.isArray(userDashboard.budgets)
-    ? userDashboard.budgets
-    : userDashboard.budgets
-    ? [userDashboard.budgets]
-    : [];
-
   return (
     <div className="flex flex-col gap-8 px-4 py-6 md:px-16">
-      <Headline overview={userDashboard.overview ?? []} />
-      <BudgetView budgets={budgetsArray} />
+      <Headline
+        headlineData={userDashboard.userMonthlyIncomeExpenseTransactions ?? []}
+      />
+      <BudgetView
+        categoriesExpenditure={
+          userDashboard.userMonthlyCategoryExpenditure ?? []
+        }
+      />
       <ChartsView
         monthlyTransactions={userDashboard.userMonthlyTransactions ?? []}
         monthlyIncomeExpenseTransactions={
