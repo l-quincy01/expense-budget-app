@@ -80,7 +80,6 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
       <div className={cn("relative", className)} ref={ref} {...props}>
         <div className="absolute top-0 z-[0] h-screen w-screen bg--950/10 dark:bg--950/10 " />
         <section className="relative max-w-full mx-auto z-1">
-          {/* <RetroGrid {...gridOptions} /> */}
           <div className="max-w-screen-xl z-10 mx-auto px-4 py-28 gap-12 md:px-8">
             <div className="space-y-5 max-w-3xl leading-0 lg:leading-5 mx-auto text-center">
               <h1 className="text-sm text-gray-600 dark:text-gray-400 group font-geist mx-auto px-5 py-2 bg-gradient-to-tr from-zinc-300/20 via-gray-400/20 to-transparent dark:from-zinc-300/5 dark:via-gray-400/5 border-[2px] border-black/5 dark:border-white/5 rounded-3xl w-fit">
@@ -111,7 +110,7 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
               </div>
             </div>
             {bottomImage && (
-              <div className="mt-32 mx-10 relative z-10">
+              <div className="mt-10 mx-10 relative z-10">
                 <img
                   src={bottomImage.light}
                   className="w-full shadow-lg rounded-lg border border-gray-200 dark:hidden"

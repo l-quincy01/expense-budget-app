@@ -13,8 +13,8 @@ export default function Index() {
       ctaText="Get Started"
       ctaHref="/login"
       bottomImage={{
-        light: "https://www.launchuicomponents.com/app-light.png",
-        dark: "https://www.launchuicomponents.com/app-dark.png",
+        light: "images/landing02_light.png",
+        dark: "images/landing02_dark.png",
       }}
       gridOptions={{
         angle: 65,

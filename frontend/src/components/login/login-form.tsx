@@ -142,11 +142,7 @@ export function LoginForm({
         }
       >
         <FieldGroup>
-          <div
-            className={`flex flex-col items-center gap-2 text-center ${
-              mode === "signup" ? "mt-14" : ""
-            }`}
-          >
+          <div className={`flex flex-col items-center gap-2 text-center `}>
             <h1 className="text-xl font-bold">Welcome</h1>
             <FieldDescription>
               {mode === "signup" ? (

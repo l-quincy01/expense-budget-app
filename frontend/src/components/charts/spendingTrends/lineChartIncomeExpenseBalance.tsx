@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { combineByMonth } from "@/utils/aggregate";
 
 export const description = "A multiple line/area/bar chart with controls";
 
@@ -101,13 +102,18 @@ export function LineChartIncomeExpenseBalance({
   const chartData = useMemo(() => {
     if (!monthlyIncomeExpenseTransactions.length) return [];
 
-    const normalizedBlocks = monthlyIncomeExpenseTransactions.map((block) => ({
-      month: block.month,
-      startingBalance: block.startingBalance,
-      transactions: [...(block.transactions ?? [])].sort(
-        (a, b) => Number(a.day) - Number(b.day)
-      ),
-    }));
+    const unaggregated_normalizedBlocks = monthlyIncomeExpenseTransactions.map(
+      (block) => ({
+        month: block.month,
+        startingBalance: block.startingBalance,
+        transactions: [...(block.transactions ?? [])].sort(
+          (a, b) => Number(a.day) - Number(b.day)
+        ),
+      })
+    );
+    const normalizedBlocks = combineByMonth(unaggregated_normalizedBlocks);
+
+    console.log("NORMALIZED BLOCKS:", normalizedBlocks);
 
     const totalMonths = normalizedBlocks.length;
 

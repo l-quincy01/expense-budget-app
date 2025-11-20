@@ -8,8 +8,24 @@ using Microsoft.IdentityModel.Tokens;
 using BudgetlyAI.Data;
 using Microsoft.EntityFrameworkCore;
 
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File(
+        "logs/budgetly_backend.log",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 14,
+        shared: true)
+    .CreateLogger();
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // CORS 
 builder.Services.AddCors(opts =>
@@ -108,6 +124,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging();
 // Middleware
 
 app.UseCors("frontend");
