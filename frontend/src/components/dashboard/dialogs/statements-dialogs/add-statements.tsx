@@ -69,11 +69,14 @@ export default function AddStatement() {
         "Uploading and processing your statement(s)…"
       );
 
-      const res = await fetch(`${apiBase}/api/dashboard/update`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
+      const res = await fetch(
+        `${apiBase}/api/dashboard/${encodeURIComponent(dashboardName)}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        }
+      );
 
       if (!res.ok) throw new Error(await res.text());
 

@@ -88,7 +88,7 @@ export default function Headline({ headlineData = [] }: HeadlineProps) {
           </CardContent>
         </Card>
 
-        <Card className="w-fit">
+        {/* <Card className="w-fit">
           <CardContent className="flex flex-row gap-8 items-center justify-between w-fit ">
             <div className="flex flex-col gap-2">
               <p className="text-sm font-semibold">Budget Set</p>
@@ -98,7 +98,7 @@ export default function Headline({ headlineData = [] }: HeadlineProps) {
               <Wallet size={28} />
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

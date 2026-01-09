@@ -1,7 +1,16 @@
 {
   "name": "ai-service",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
+  "imports": {
+    "#config/*": "./src/config/*",
+    "#controllers/*": "./src/controllers/*",
+    "#services/*": "./src/services/*",
+    "#db/*": "./src/db/*",
+    "#models/*": "./src/models/*",
+    "#routes/*": "./src/routes/*"
+  },
   "scripts": {
     "dev": "tsx watch src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,6 +32,7 @@
     "mongodb": "^6.20.0",
     "multer": "^2.0.2",
     "openai": "^6.7.0",
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "winston": "^3.18.3"
   }
 }
