@@ -1,11 +1,31 @@
+// {
+//   "compilerOptions": {
+//     "module": "commonjs",
+//     "esModuleInterop": true,
+//     "target": "es6",
+//     "moduleResolution": "node",
+//     "sourceMap": true,
+//     "outDir": "dist"
+//   },
+//   "lib": ["es2015"]
+// }
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "es6",
+    "module": "esnext",
+    "target": "es2020",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "#services/*": ["src/services/*"],
+      "#controllers/*": ["src/controllers/*"],
+      "#config/*": ["src/config/*"],
+      "#db/*": ["src/db/*"],
+      "#models/*": ["src/models/*"],
+      "#routes/*": ["src/routes/*"]
+    }
   },
-  "lib": ["es2015"]
+  "include": ["src"]
 }

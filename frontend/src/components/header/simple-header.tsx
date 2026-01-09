@@ -32,22 +32,22 @@ export function SimpleHeader() {
 
   return (
     <header className=" top-4 z-50 w-full  backdrop-blur-lg">
-      <nav className="flex h-14 w-full max-w-4xl items-center justify-between px-4">
-        <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
+      <nav className="flex h-14 w-full flex-row  items-center justify-between px-4">
+        <div className="flex w-full items-center gap-2 cursor-pointer">
           <p className=" text-lg font-bold">Budgetly-AI</p>
-        </Link>
-        <div className="hidden items-center gap-2 lg:flex">
-          {links.map((link, i) => (
-            <Link
-              key={i}
-              className={buttonVariants({ variant: "ghost" })}
-              href={link.href}
-            >
-              {link.label}
-            </Link>
-          ))}
-          {/* <Link href={"/login"}>Login</Link>
-          <Link href={"/sign-up"}>Sign Up</Link> */}
+        </div>
+        <div className="w-full flex flex-row justify-between">
+          <div className="hidden items-center gap-2 lg:flex">
+            {links.map((link, i) => (
+              <Link
+                key={i}
+                className={buttonVariants({ variant: "ghost" })}
+                href={link.href}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
           <div className="flex items-center gap-2">
             {isSignedIn ? (
               <>

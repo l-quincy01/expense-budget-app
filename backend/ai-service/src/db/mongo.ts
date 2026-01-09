@@ -1,5 +1,5 @@
 import { Db, MongoClient } from "mongodb";
-import { DashboardDoc } from "./models.js";
+import { DashboardDoc } from "#models/models";
 
 let db: Db;
 

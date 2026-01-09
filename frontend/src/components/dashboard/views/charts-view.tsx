@@ -24,6 +24,7 @@ import { BarchartIncomeExpense } from "@/components/charts/spendingTrends/barcha
 import { sumIncomeAndExpenses } from "@/utils/sumExpenses";
 import { PieChartCategories } from "@/components/charts/spendingCategories/pieChartCategories";
 import { BarChartCategories } from "@/components/charts/spendingCategories/barChartCategories";
+import { combineByMonth } from "@/utils/aggregate";
 
 type ChartsViewProps = {
   monthlyTransactions?: userMonthlyTransactions[];
@@ -38,6 +39,10 @@ export default function ChartsView({
 }: ChartsViewProps) {
   const [chartView, setChartView] = useState("trends");
   const [gridlayout, setGridlayout] = useState(false);
+
+  console.log(
+    sumIncomeAndExpenses(combineByMonth(monthlyIncomeExpenseTransactions))
+  );
 
   return (
     <div className="space-y-4">
@@ -79,9 +84,10 @@ export default function ChartsView({
           <>
             <BarchartIncomeExpense
               incomeExpenseTotals={sumIncomeAndExpenses(
-                monthlyIncomeExpenseTransactions
+                combineByMonth(monthlyIncomeExpenseTransactions)
               )}
             />
+
             <LineChartSpending monthlyTransactions={monthlyTransactions} />
             <LineChartIncomeExpenseBalance
               monthlyIncomeExpenseTransactions={

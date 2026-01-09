@@ -102,7 +102,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
       .filter((item) => item.category === categoryName)
       .reduce((sum, item) => sum + item.totalSpend, 0);
   }
-
+  console.log("LENGHT:", userBudgets.length);
   return (
     <div className="space-y-2">
       <div className="gap-1">
@@ -140,16 +140,96 @@ export default function BudgetView({ categoriesExpenditure }: props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 gap-4">
-        {budgetView === "topBudgets" &&
-          [...userBudgets]
-            .sort((a, b) => b.budgetAmount - a.budgetAmount)
-            .slice(0, 6)
-            .map((budget, index) => {
+      {userBudgets.length !== 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {budgetView === "topBudgets" &&
+            [...userBudgets]
+              .sort((a, b) => b.budgetAmount - a.budgetAmount)
+              .slice(0, 6)
+              .map((budget, index) => {
+                const percentage =
+                  (spentAmountMatcher(categoriesExpenditure, budget.category) /
+                    budget.budgetAmount) *
+                  100;
+                return (
+                  <Card className="py-2 px-0" key={index}>
+                    <CardContent className="flex flex-col gap-0 w-full justify-center">
+                      <div className="flex flex-row justify-end p-0 items-start">
+                        <DeleteBudget
+                          budgetID={budget.id}
+                          onDeleted={refreshBudgets}
+                        />
+                        <EditBudgetDialog
+                          budget={{
+                            id: budget.id,
+                            dashboardName: budget.dashboardName,
+                            category: budget.category,
+                            budgetAmount: budget.budgetAmount,
+                            spentAmount: budget.spentAmount,
+                          }}
+                          onBudgetUpdated={refreshBudgets}
+                        />
+                      </div>
+
+                      <div className="flex flex-row items-center gap-4 justify-between">
+                        <div className="flex flex-row items-center gap-2">
+                          <div className="p-4 rounded-full bg-accent">
+                            {Icon(budget.category)}
+                          </div>
+                          <div className="text-sm font-semibold break-words whitespace-normal">
+                            {formatCategoryName(budget.category)}
+                          </div>
+                        </div>
+                        <div className="text-lg font-bold">
+                          {budget.budgetAmount}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 w-full my-4">
+                        <div className="flex flex-row items-center w-full justify-between text-xs text-muted-foreground">
+                          <div>
+                            Spent:{" "}
+                            {spentAmountMatcher(
+                              categoriesExpenditure,
+                              budget.category
+                            ).toFixed(2)}
+                          </div>
+                          <div>
+                            Remaining:{" "}
+                            {budget.budgetAmount - budget.spentAmount < 0 ? (
+                              <>0</>
+                            ) : (
+                              <>{budget.budgetAmount - budget.spentAmount}</>
+                            )}{" "}
+                          </div>
+                        </div>
+
+                        <Tooltip>
+                          <TooltipTrigger>
+                            {" "}
+                            <Progress value={percentage} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {percentage > 80 ? (
+                              <p className="inline-flex items-center">
+                                {" "}
+                                <TriangleAlert size={12} />
+                                You have spent over 80% of your budget
+                              </p>
+                            ) : (
+                              <p>You are within your budget goals</p>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+          {budgetView == "allBudgets" &&
+            userBudgets.map((budget, index) => {
               const percentage =
-                (spentAmountMatcher(categoriesExpenditure, budget.category) /
-                  budget.budgetAmount) *
-                100;
+                (budget.spentAmount / budget.budgetAmount) * 100;
               return (
                 <Card className="py-2 px-0" key={index}>
                   <CardContent className="flex flex-col gap-0 w-full justify-center">
@@ -186,13 +266,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
 
                     <div className="flex flex-col gap-2 w-full my-4">
                       <div className="flex flex-row items-center w-full justify-between text-xs text-muted-foreground">
-                        <div>
-                          Spent:{" "}
-                          {spentAmountMatcher(
-                            categoriesExpenditure,
-                            budget.category
-                          ).toFixed(2)}
-                        </div>
+                        <div>Spent: {budget.spentAmount}</div>
                         <div>
                           Remaining:{" "}
                           {budget.budgetAmount - budget.spentAmount < 0 ? (
@@ -202,7 +276,6 @@ export default function BudgetView({ categoriesExpenditure }: props) {
                           )}{" "}
                         </div>
                       </div>
-
                       <Tooltip>
                         <TooltipTrigger>
                           {" "}
@@ -225,78 +298,14 @@ export default function BudgetView({ categoriesExpenditure }: props) {
                 </Card>
               );
             })}
-        {budgetView == "allBudgets" &&
-          userBudgets.map((budget, index) => {
-            const percentage = (budget.spentAmount / budget.budgetAmount) * 100;
-            return (
-              <Card className="py-2 px-0" key={index}>
-                <CardContent className="flex flex-col gap-0 w-full justify-center">
-                  <div className="flex flex-row justify-end p-0 items-start">
-                    <DeleteBudget
-                      budgetID={budget.id}
-                      onDeleted={refreshBudgets}
-                    />
-                    <EditBudgetDialog
-                      budget={{
-                        id: budget.id,
-                        dashboardName: budget.dashboardName,
-                        category: budget.category,
-                        budgetAmount: budget.budgetAmount,
-                        spentAmount: budget.spentAmount,
-                      }}
-                      onBudgetUpdated={refreshBudgets}
-                    />
-                  </div>
-
-                  <div className="flex flex-row items-center gap-4 justify-between">
-                    <div className="flex flex-row items-center gap-2">
-                      <div className="p-4 rounded-full bg-accent">
-                        {Icon(budget.category)}
-                      </div>
-                      <div className="text-sm font-semibold break-words whitespace-normal">
-                        {formatCategoryName(budget.category)}
-                      </div>
-                    </div>
-                    <div className="text-lg font-bold">
-                      {budget.budgetAmount}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2 w-full my-4">
-                    <div className="flex flex-row items-center w-full justify-between text-xs text-muted-foreground">
-                      <div>Spent: {budget.spentAmount}</div>
-                      <div>
-                        Remaining:{" "}
-                        {budget.budgetAmount - budget.spentAmount < 0 ? (
-                          <>0</>
-                        ) : (
-                          <>{budget.budgetAmount - budget.spentAmount}</>
-                        )}{" "}
-                      </div>
-                    </div>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {" "}
-                        <Progress value={percentage} />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {percentage > 80 ? (
-                          <p className="inline-flex items-center">
-                            {" "}
-                            <TriangleAlert size={12} />
-                            You have spent over 80% of your budget
-                          </p>
-                        ) : (
-                          <p>You are within your budget goals</p>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-      </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center ">
+          <div className="text-muted-foreground">
+            Add Bugets to Get Started.
+          </div>
+        </div>
+      )}
     </div>
   );
 }
