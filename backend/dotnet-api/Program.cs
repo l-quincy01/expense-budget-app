@@ -125,8 +125,8 @@ builder.Configuration.AddEnvironmentVariables();
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
-// Middleware
 
+// Middleware
 app.UseCors("frontend");
 
 app.UseAuthentication();
