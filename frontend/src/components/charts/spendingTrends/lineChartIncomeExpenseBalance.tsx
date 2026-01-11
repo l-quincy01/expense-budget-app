@@ -175,8 +175,12 @@ export function LineChartIncomeExpenseBalance({
     <Card className="w-full">
       <CardHeader className="flex flex-row justify-between items-center">
         <div>
-          <CardTitle>Income vs Expense vs Balance</CardTitle>
-          <CardDescription>Statement snapshot</CardDescription>
+          <CardTitle className="line-clamp-1">
+            Income vs Expense vs Balance
+          </CardTitle>
+          <CardDescription className="line-clamp-1">
+            Statement snapshot
+          </CardDescription>
         </div>
 
         <div className="flex flex-row gap-2 items-center">
@@ -209,10 +213,10 @@ export function LineChartIncomeExpenseBalance({
             </SelectContent>
           </Select>
 
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-row gap-2 ">
             <Button
               variant="secondary"
-              className={range === "1m" ? "bg-accent" : "bg-transparent"}
+              className={range === "1m" ? "bg-accent" : "bg-transparent "}
               onClick={() => setRange("1m")}
             >
               1m

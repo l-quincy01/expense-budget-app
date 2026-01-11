@@ -40,7 +40,7 @@ export default function DeleteDashboard({
 
     try {
       setIsSubmitting(true);
-      await api<void>(`/api/dashboard/${encodeURIComponent(dashboardName)}`, {
+      await api<void>(`/api/dashboards/${encodeURIComponent(dashboardName)}`, {
         method: "DELETE",
       });
       toast.success(`Dashboard "${dashboardName}" deleted.`);

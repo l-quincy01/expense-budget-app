@@ -27,11 +27,6 @@ export default function DashboardLanding() {
   }
 
   return (
-    // <div className="px-6 py-8 text-muted-foreground">
-    //   {loading
-    //     ? "Loading your dashboards..."
-    //     : "Select a dashboard from the sidebar or create a new one to get started."}
-    // </div>
     <>
       {loading ? (
         <div className="px-6 py-8 text-muted-foreground">

@@ -2,8 +2,9 @@
 using MongoDB.Driver;
 using BudgetlyAI.Models;
 using Serilog;
+using BudgetlyAI.Models.ReadModels.Dashboard;
 
-namespace BudgetlyAI.Services
+namespace BudgetlyAI.Services.Persistence
 {
     public class MongoDbService
     {

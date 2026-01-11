@@ -70,9 +70,9 @@ export default function AddStatement() {
       );
 
       const res = await fetch(
-        `${apiBase}/api/dashboard/${encodeURIComponent(dashboardName)}`,
+        `${apiBase}/api/dashboards/${encodeURIComponent(dashboardName)}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: { Authorization: `Bearer ${token}` },
           body: form,
         }
@@ -114,6 +114,8 @@ export default function AddStatement() {
     }
   };
 
+  const displayDashboardName = decodeURIComponent(dashboardName);
+
   return (
     <div className="space-y-4">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -132,7 +134,7 @@ export default function AddStatement() {
             <DialogTitle>
               {" "}
               Add statement for:
-              {dashboardName}
+              {displayDashboardName}
             </DialogTitle>
             <DialogDescription>
               Build your dashboard with more statements.
