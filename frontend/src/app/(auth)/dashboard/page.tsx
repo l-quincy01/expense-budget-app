@@ -7,8 +7,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 
 export default function DashboardLanding() {
+  const { systemTheme } = useTheme();
+
   const router = useRouter();
   const { userDashboardNames, loading, error } = useDashboard();
 
@@ -38,12 +41,21 @@ export default function DashboardLanding() {
             Select a dashboard from the sidebar or create a new one to get
             started.
           </div>
-          <img
-            width={600}
-            height={400}
-            src={"/images/noDashboards.avif"}
-            alt="No dashboards"
-          />
+          {systemTheme === "dark" ? (
+            <img
+              width={600}
+              height={400}
+              src={"/images/noDashboards-dark.png"}
+              alt="No dashboards"
+            />
+          ) : (
+            <img
+              width={600}
+              height={400}
+              src={"/images/noDashboards-light.avif"}
+              alt="No dashboards"
+            />
+          )}
         </div>
       )}
     </>

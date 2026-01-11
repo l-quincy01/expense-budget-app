@@ -79,23 +79,7 @@ export interface DashboardDoc {
   }[];
 
   budgets?: {
-    category:
-      | "GeneralRetail"
-      | "Transport"
-      | "EatingOutAndTreats"
-      | "Fuel"
-      | "Groceries"
-      | "ProfessionalServices"
-      | "CarUseAndServices"
-      | "DonationsAndGiving"
-      | "GiftsAndFlowers"
-      | "Hobbies"
-      | "HomewareAndAppliances"
-      | "MusicGamingApps"
-      | "OutdoorAndAdventure"
-      | "PharmaciesAndWellbeing"
-      | "TravelAndHolidays"
-      | "Other";
+    category: categories;
     budgetAmount: number;
     spentAmount: number;
   };
@@ -119,23 +103,7 @@ export interface DashboardDoc {
     userId: string;
     dashboardName: string;
     month: string;
-    category:
-      | "GeneralRetail"
-      | "Transport"
-      | "EatingOutAndTreats"
-      | "Fuel"
-      | "Groceries"
-      | "ProfessionalServices"
-      | "CarUseAndServices"
-      | "DonationsAndGiving"
-      | "GiftsAndFlowers"
-      | "Hobbies"
-      | "HomewareAndAppliances"
-      | "MusicGamingApps"
-      | "OutdoorAndAdventure"
-      | "PharmaciesAndWellbeing"
-      | "TravelAndHolidays"
-      | "Other";
+    category: categories;
     totalSpend: number;
   }[];
 
