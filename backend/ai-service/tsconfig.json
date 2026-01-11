@@ -25,6 +25,7 @@
       "#db/*": ["src/db/*"],
       "#models/*": ["src/models/*"],
       "#routes/*": ["src/routes/*"],
+      "#llm/*": ["src/llm/*"],
       "#validators/*": ["src/validators/*"]
     }
   },
