@@ -1,4 +1,3 @@
-import { extractAllThree } from "#services/openaiService";
 import { collections } from "#db/mongo";
 import logger from "#config/logger";
 
@@ -6,6 +5,7 @@ import {
   buildDashboardDocument,
   buildDashboardUpdate,
 } from "src/mappers/dashboard.mapper";
+import { generateStatementDataUseCase } from "./llmUseCase.service";
 
 export async function createDashboard(input: {
   userId: string;
@@ -18,12 +18,15 @@ export async function createDashboard(input: {
     pdfCount: input.pdfs.length,
   });
 
-  const extracted = await extractAllThree(input.pdfs, input.userId);
+  const statementData = await generateStatementDataUseCase(
+    input.pdfs,
+    input.userId
+  );
 
   const dashboardDoc = buildDashboardDocument(
     input.userId,
     input.dashboardName,
-    extracted
+    statementData
   );
 
   const col = collections();
@@ -60,12 +63,15 @@ export async function updateDashboard(input: {
     throw err;
   }
 
-  const extracted = await extractAllThree(input.pdfs, input.userId);
+  const statementData = await generateStatementDataUseCase(
+    input.pdfs,
+    input.userId
+  );
 
   const update = buildDashboardUpdate(
     input.userId,
     input.dashboardName,
-    extracted
+    statementData
   );
 
   if (!update.$push) {

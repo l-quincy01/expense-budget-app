@@ -10,18 +10,18 @@ using BudgetlyAI.Infrastructure.Auth;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class DashboardController : ControllerBase
+public class DashboardsController : ControllerBase
 {
     private readonly IDashboardService _dashboardService;
     private readonly IDashboardQueryService _dashboardQueryService;
-    private readonly ILogger<DashboardController> _logger;
+    private readonly ILogger<DashboardsController> _logger;
     private readonly MongoDbService _mongo;
 
-    public DashboardController(
+    public DashboardsController(
         MongoDbService mongo,
         IDashboardService dashboardService,
         IDashboardQueryService dashboardQueryService,
-        ILogger<DashboardController> logger)
+        ILogger<DashboardsController> logger)
     {
         _mongo = mongo;
         _dashboardService = dashboardService;
