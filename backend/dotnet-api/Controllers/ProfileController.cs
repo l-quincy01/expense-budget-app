@@ -28,6 +28,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BudgetlyAI.Services;
 using Serilog;
+using BudgetlyAI.Services.Auth;
 
 namespace BudgetlyAI.Controllers;
 

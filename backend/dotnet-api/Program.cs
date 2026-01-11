@@ -1,5 +1,5 @@
 using Clerk.BackendAPI;
-using BudgetlyAI.Services;
+
 using Microsoft.AspNetCore.Http.Features;
 
 
@@ -9,6 +9,12 @@ using BudgetlyAI.Data;
 using Microsoft.EntityFrameworkCore;
 
 using Serilog;
+using BudgetlyAI.Services.Persistence;
+using BudgetlyAI.Services.Auth;
+using BudgetlyAI.Services.Transactions;
+using BudgetlyAI.Services.Budgets;
+using BudgetlyAI.Services.Dashboards;
+using BudgetlyAI.Services.Ingest;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -46,6 +52,19 @@ builder.Services.Configure<FormOptions>(o =>
 
 // Controllers
 builder.Services.AddControllers();
+
+//Services
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
+builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
+
+builder.Services.AddScoped<INodeIngestClient, NodeIngestClient>();
+
+
 
 // Postgres
 builder.Services.AddDbContext<BudgetsDbContext>(options =>

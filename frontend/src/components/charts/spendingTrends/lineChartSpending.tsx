@@ -320,7 +320,7 @@ export function LineChartSpending({
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Spend Line Chart</CardTitle>
+          <CardTitle className="line-clamp-1">Spend Line Chart</CardTitle>
           <CardDescription>Loading chart...</CardDescription>
         </CardHeader>
       </Card>
@@ -337,8 +337,10 @@ export function LineChartSpending({
     <Card className="w-full">
       <CardHeader className="flex flex-row justify-between">
         <div>
-          <CardTitle>Spend Line Chart</CardTitle>
-          <CardDescription>Transactions snapshot</CardDescription>
+          <CardTitle className="line-clamp-1">Spend Line Chart</CardTitle>
+          <CardDescription className="line-clamp-1">
+            Transactions snapshot
+          </CardDescription>
         </div>
 
         <div className="flex flex-row gap-2 items-center">

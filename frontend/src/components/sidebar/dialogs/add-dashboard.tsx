@@ -108,9 +108,7 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
         "Uploading and processing your statement(s)…"
       );
 
-      console.log("FUCK HERE->", apiBase);
-
-      const res = await fetch(`${apiBase}/api/dashboard`, {
+      const res = await fetch(`${apiBase}/api/dashboards`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: form,
