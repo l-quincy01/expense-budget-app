@@ -78,7 +78,7 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   ) => {
     return (
       <div className={cn("relative", className)} ref={ref} {...props}>
-        <div className="absolute top-0 z-[0] h-screen w-screen bg--950/10 dark:bg--950/10 " />
+        <div className="absolute top-0 z-[0]  bg--950/10 dark:bg--950/10 " />
         <section className="relative max-w-full mx-auto z-1">
           <div className="max-w-screen-xl z-10 mx-auto px-4 py-28 gap-12 md:px-8">
             <div className="space-y-5 max-w-3xl leading-0 lg:leading-5 mx-auto text-center">
