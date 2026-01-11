@@ -1,92 +1,187 @@
 using BudgetlyAI.Data;
 using BudgetlyAI.Models;
 using BudgetlyAI.Services;
+using BudgetlyAI.Services.Auth;
+using BudgetlyAI.Services.Persistence;
+using BudgetlyAI.Services.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BudgetlyAI.Controllers;
+using MongoDB.Driver;
 
+
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionsController : ControllerBase
 {
-    private readonly BudgetsDbContext _context;
+    private readonly ITransactionService _transactionService;
     private readonly ClerkAuthService _clerkAuth;
+    private readonly ILogger<TransactionsController> _logger;
+    private readonly MongoDbService _mongo;
 
-    public TransactionsController(BudgetsDbContext context, ClerkAuthService clerkAuth)
+    public TransactionsController(
+        MongoDbService mongo,
+        ITransactionService transactionService,
+        ClerkAuthService clerkAuth,
+        ILogger<TransactionsController> logger)
     {
-        _context = context;
+        _mongo = mongo;
+        _transactionService = transactionService;
         _clerkAuth = clerkAuth;
+        _logger = logger;
     }
 
+
+    // ------------------------
+    // CREATE
+    // POST /api/transactions/
+    // ------------------------
+    [HttpPost]
+    public async Task<IActionResult> CreateTransaction(
+        [FromBody] UserAddedTransaction transaction)
+    {
+        _logger.LogInformation("[CreateTransaction] Incoming request");
+
+        var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
+        if (!isAuth || userId is null)
+        {
+            _logger.LogWarning("[CreateTransaction] Unauthorized request");
+            return Unauthorized();
+        }
+
+        _logger.LogInformation(
+            "[CreateTransaction] Authenticated userId={UserId}",
+            userId);
+
+        var created = await _transactionService
+            .CreateTransactionAsync(userId, transaction);
+
+        return Ok(created);
+    }
+
+    // ------------------------
+    // READ
+    // GET /api/transactions/{name}
+    // ------------------------
     [HttpGet]
     public async Task<IActionResult> GetTransactions([FromQuery] string? dashboardName)
     {
-        var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
-        if (!isAuth || userId is null) return Unauthorized();
+        _logger.LogInformation(
+            "[GetTransactions] Incoming request. dashboardName={DashboardName}",
+            dashboardName);
 
-        var query = _context.UserAddedTransactions.Where(t => t.UserId == userId);
-        if (!string.IsNullOrWhiteSpace(dashboardName))
+        var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
+        if (!isAuth || userId is null)
         {
-            query = query.Where(t => t.DashboardName == dashboardName);
+            _logger.LogWarning("[GetTransactions] Unauthorized request");
+            return Unauthorized();
         }
 
-        var transactions = await query
-            .OrderByDescending(t => t.Date)
-            .ThenByDescending(t => t.Id)
-            .ToListAsync();
+        _logger.LogInformation(
+            "[GetTransactions] Authenticated userId={UserId}",
+            userId);
+
+        var transactions = await _transactionService
+            .GetTransactionsAsync(userId, dashboardName);
 
         return Ok(transactions);
     }
+    // ------------------------
+    // READ
+    // GET /api/transactions/monthly
+    // ------------------------
 
-    [HttpPost]
-    public async Task<IActionResult> CreateTransaction([FromBody] UserAddedTransaction transaction)
+    [HttpGet("monthly")]
+    public async Task<IActionResult> GetMonthlyTransactions(CancellationToken ct)
     {
-        var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
-        if (!isAuth || userId is null) return Unauthorized();
+        _logger.LogInformation("[GetMonthlyTransactions] Incoming request");
 
-        transaction.UserId = userId;
-        transaction.Id = Guid.NewGuid();
-        transaction.Date = transaction.Date.Date;
+        var userId = User.FindFirst("sub")?.Value;
+        _logger.LogInformation("[GetMonthlyTransactions] userId={UserId}", userId);
 
-        _context.UserAddedTransactions.Add(transaction);
-        await _context.SaveChangesAsync();
-        return Ok(transaction);
+        _logger.LogInformation("[GetMonthlyTransactions] Querying MongoDB for monthly transactions");
+
+        var filter = Builders<UserMonthlyTransaction>
+            .Filter.Eq(x => x.UserId, userId);
+
+        var docs = await _mongo.MonthlyTransactions
+            .Find(filter)
+            .ToListAsync(ct);
+
+        _logger.LogInformation(
+            "[GetMonthlyTransactions] Retrieved {Count} records",
+            docs.Count);
+
+        return Ok(docs);
     }
+
+
+
+
+    // ------------------------
+    // UPDATE
+    // UPDATE /api/transactions/{id}
+    // ------------------------  
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateTransaction(Guid id, [FromBody] UserAddedTransaction updatedTransaction)
+    public async Task<IActionResult> UpdateTransaction(
+        Guid id,
+        [FromBody] UserAddedTransaction updatedTransaction)
     {
+        _logger.LogInformation(
+            "[UpdateTransaction] Incoming request. transactionId={TransactionId}",
+            id);
+
         var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
-        if (!isAuth || userId is null) return Unauthorized();
+        if (!isAuth || userId is null)
+        {
+            _logger.LogWarning("[UpdateTransaction] Unauthorized request");
+            return Unauthorized();
+        }
 
-        var existing = await _context.UserAddedTransactions
-            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+        _logger.LogInformation(
+            "[UpdateTransaction] Authenticated userId={UserId}",
+            userId);
 
-        if (existing is null) return NotFound();
+        var updated = await _transactionService
+            .UpdateTransactionAsync(userId, id, updatedTransaction);
 
-        existing.DashboardName = updatedTransaction.DashboardName;
-        existing.Date = updatedTransaction.Date.Date;
-        existing.Description = updatedTransaction.Description;
-        existing.Amount = updatedTransaction.Amount;
+        if (updated is null)
+            return NotFound();
 
-        await _context.SaveChangesAsync();
-        return Ok(existing);
+        return Ok(updated);
     }
 
+    // ------------------------
+    // DELETE
+    // DELETE /api/transactions/{id}
+    // ------------------------  
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteTransaction(Guid id)
     {
+        _logger.LogInformation(
+            "[DeleteTransaction] Incoming request. transactionId={TransactionId}",
+            id);
+
         var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
-        if (!isAuth || userId is null) return Unauthorized();
+        if (!isAuth || userId is null)
+        {
+            _logger.LogWarning("[DeleteTransaction] Unauthorized request");
+            return Unauthorized();
+        }
 
-        var entity = await _context.UserAddedTransactions
-            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+        _logger.LogInformation(
+            "[DeleteTransaction] Authenticated userId={UserId}",
+            userId);
 
-        if (entity is null) return NotFound();
+        var deleted = await _transactionService
+            .DeleteTransactionAsync(userId, id);
 
-        _context.UserAddedTransactions.Remove(entity);
-        await _context.SaveChangesAsync();
+        if (!deleted)
+            return NotFound();
+
         return NoContent();
     }
 }

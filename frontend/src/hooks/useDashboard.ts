@@ -35,9 +35,9 @@ export default function useDashboard(explicitName?: string) {
   const refreshDashboardNames = useCallback(async () => {
     try {
       setNamesLoading(true);
-      const names = await fetchApi<string[]>(`/api/dashboarddata/names`);
+      const dashboardNames = await fetchApi<string[]>(`/api/dashboards/names`);
       if (!mountedRef.current) return;
-      setUserDashboardNames(names);
+      setUserDashboardNames(dashboardNames);
       setError(null);
     } catch (e) {
       if (mountedRef.current)
@@ -64,11 +64,11 @@ export default function useDashboard(explicitName?: string) {
     (async () => {
       try {
         setDashboardLoading(true);
-        const dash = await fetchApi<dashboard>(
-          `/api/dashboarddata/${encodeURIComponent(dashboardName)}`
+        const dashboard = await fetchApi<dashboard>(
+          `/api/dashboards/${encodeURIComponent(dashboardName)}`
         );
         if (!mounted) return;
-        setUserDashboard(sortDashboardMonths(dash));
+        setUserDashboard(sortDashboardMonths(dashboard));
         setError(null);
       } catch (e) {
         if (mounted)

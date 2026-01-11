@@ -14,6 +14,6 @@ const upload = multer({
 
 router.post("/", upload.array("pdfs", 10), createDashboard);
 
-router.put("/:dashboardName", upload.array("pdfs", 10), updateDashboard);
+router.patch("/:dashboardName", upload.array("pdfs", 10), updateDashboard);
 
 export default router;

@@ -4,7 +4,7 @@ using Clerk.BackendAPI.Helpers.Jwks;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
-namespace BudgetlyAI.Services;
+namespace BudgetlyAI.Services.Auth;
 
 public class ClerkAuthService
 {
