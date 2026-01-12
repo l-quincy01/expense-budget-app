@@ -9,7 +9,6 @@ export function combineByMonth(data: any[]) {
     };
   } = {};
 
-  // Helper: find earliest transaction day in an entry
   function getEarliestDay(transactions: { day: string }[]): number {
     return Math.min(...transactions.map((t) => Number(t.day)));
   }
@@ -19,20 +18,17 @@ export function combineByMonth(data: any[]) {
     const earliestDay = getEarliestDay(transactions);
 
     if (!monthMap[month]) {
-      // First time we see this month
       monthMap[month] = {
         month,
         startingBalance,
         transactions: [...transactions],
-        _earliestStartDay: earliestDay, // internal helper field
+        _earliestStartDay: earliestDay,
       };
     } else {
       const existing = monthMap[month];
 
-      // Merge transactions
       existing.transactions.push(...transactions);
 
-      // If this entry starts earlier in the month, update startingBalance
       if (earliestDay < existing._earliestStartDay) {
         existing.startingBalance = startingBalance;
         existing._earliestStartDay = earliestDay;
@@ -40,7 +36,6 @@ export function combineByMonth(data: any[]) {
     }
   });
 
-  // Build result without Object.values
   const result: {
     month: string;
     startingBalance: number;
@@ -51,10 +46,8 @@ export function combineByMonth(data: any[]) {
     if (Object.prototype.hasOwnProperty.call(monthMap, month)) {
       const monthObj = monthMap[month];
 
-      // Sort transactions by day
       monthObj.transactions.sort((a, b) => Number(a.day) - Number(b.day));
 
-      // Push a clean object (without _earliestStartDay)
       result.push({
         month: monthObj.month,
         startingBalance: monthObj.startingBalance,
