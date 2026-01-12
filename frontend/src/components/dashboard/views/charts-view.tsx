@@ -40,10 +40,6 @@ export default function ChartsView({
   const [chartView, setChartView] = useState("trends");
   const [gridlayout, setGridlayout] = useState(false);
 
-  console.log(
-    sumIncomeAndExpenses(combineByMonth(monthlyIncomeExpenseTransactions))
-  );
-
   return (
     <div className="space-y-4">
       <div className="w-full flex flex-row justify-between">
