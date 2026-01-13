@@ -181,7 +181,7 @@ export function LineChartMultipleCategories({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="linear">Linear</SelectItem>
-
+            <SelectItem value="natural">Line</SelectItem>
             <SelectItem value="step">Step</SelectItem>
           </SelectContent>
         </Select>
@@ -193,7 +193,10 @@ export function LineChartMultipleCategories({
             No category data found yet.
           </div>
         ) : (
-          <ChartContainer config={chartConfig}>
+          <ChartContainer
+            className="aspect-auto md:h-[400px] w-full"
+            config={chartConfig}
+          >
             <LineChart
               data={chartData}
               accessibilityLayer

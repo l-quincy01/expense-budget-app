@@ -106,7 +106,7 @@ export function PieChartCategories({ monthlyCategoryExpenditure }: props) {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[500px]"
+          className="mx-auto aspect-square  max-h-[450px]"
         >
           {chartData.length !== 0 ? (
             <PieChart>

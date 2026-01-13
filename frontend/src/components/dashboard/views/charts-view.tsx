@@ -74,7 +74,7 @@ export default function ChartsView({
 
       {/* Trends Charts */}
       <div
-        className={`grid ${gridlayout ? "grid-cols-2" : "grid-cols-1"} gap-4`}
+        className={`grid ${gridlayout ? "grid-cols-2" : "grid-cols-1"} gap-4 `}
       >
         {chartView === "trends" && (
           <>
