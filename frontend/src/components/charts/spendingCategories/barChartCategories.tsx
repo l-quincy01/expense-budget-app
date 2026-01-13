@@ -115,7 +115,10 @@ export function BarChartCategories({ monthlyCategoryExpenditure }: props) {
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="pt-4" config={chartConfig}>
+        <ChartContainer
+          className="aspect-auto md:h-[400px] w-full"
+          config={chartConfig}
+        >
           {chartData.length != 0 ? (
             <BarChart
               accessibilityLayer

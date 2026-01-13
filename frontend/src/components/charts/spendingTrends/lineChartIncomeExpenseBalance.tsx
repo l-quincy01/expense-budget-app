@@ -207,7 +207,7 @@ export function LineChartIncomeExpenseBalance({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="linear">Linear</SelectItem>
-
+              <SelectItem value="natural">Line</SelectItem>
               <SelectItem value="step">Step</SelectItem>
               <SelectItem value="barMultiple">Bar Multiple</SelectItem>
             </SelectContent>
@@ -246,6 +246,7 @@ export function LineChartIncomeExpenseBalance({
           </div>
         ) : (
           <ChartContainer
+            className="aspect-auto md:h-[400px] w-full"
             config={chartConfig}
             onClick={() => {
               if (activeSeries !== "all") {

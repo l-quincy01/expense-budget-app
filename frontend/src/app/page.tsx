@@ -13,8 +13,8 @@ export default function Index() {
       ctaText="Get Started"
       ctaHref="/login"
       bottomImage={{
-        light: "images/landing02_light.png",
-        dark: "images/landing02_dark.png",
+        light: "images/index-light.png",
+        dark: "images/index-dark.png",
       }}
       gridOptions={{
         angle: 65,

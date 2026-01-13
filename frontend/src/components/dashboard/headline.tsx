@@ -185,54 +185,7 @@ export default function Headline({ headlineData = [] }: HeadlineProps) {
             </div>
           </CardFooter>
         </Card>
-
-        {/* <Card className="@container/card w-full">
-          <CardHeader>
-            <CardDescription>
-              <p className="text-sm font-semibold"></p>
-            </CardDescription>
-            <CardTitle>
-              <p className="font-bold text-2xl">
-                R {currentOverview?.moneyIn ?? 0}
-              </p>
-            </CardTitle>
-            <CardAction>
-              <BanknoteArrowDown size={28} />
-            </CardAction>
-          </CardHeader>
-        </Card> */}
       </div>
-
-      {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 w-fit">
-        <Card className="w-fit">
-          <CardContent className="flex flex-row gap-8 items-center justify-between w-fit ">
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-semibold">Money Out</p>
-              <p className="font-bold text-2xl">
-                {currentOverview?.moneyOut ?? 0}
-              </p>
-            </div>
-            <div className="p-4 rounded-full bg-accent">
-              <BanknoteArrowDown size={28} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="w-fit">
-          <CardContent className="flex flex-row gap-8 items-center justify-between w-fit ">
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-semibold">Money In</p>
-              <p className="font-bold text-2xl">
-                {currentOverview?.moneyIn ?? 0}
-              </p>
-            </div>
-            <div className="p-4 rounded-full bg-accent">
-              <BanknoteArrowUp size={28} />
-            </div>
-          </CardContent>
-        </Card>
-
-      </div> */}
     </div>
   );
 }
