@@ -44,13 +44,16 @@ export function BarchartIncomeExpense({ incomeExpenseTotals }: props) {
     },
   } satisfies ChartConfig;
   return (
-    <Card>
+    <Card className="">
       <CardHeader>
         <CardTitle>Income vs Expense</CardTitle>
         <CardDescription>Snapshot of Income vs Expense (MoM)</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer
+          className="aspect-auto md:h-[400px] w-full"
+          config={chartConfig}
+        >
           <BarChart accessibilityLayer data={incomeExpenseTotals}>
             <CartesianGrid vertical={false} />
             <XAxis

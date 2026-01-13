@@ -350,6 +350,7 @@ export function LineChartSpending({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="linear">Linear</SelectItem>
+              <SelectItem value="natural">Line</SelectItem>
               <SelectItem value="step">Step</SelectItem>
               <SelectItem value="barChart">Bar</SelectItem>
             </SelectContent>
@@ -397,7 +398,10 @@ export function LineChartSpending({
             No transaction data available for this dashboard yet.
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto md:h-[400px] w-full"
+          >
             {chartType === "barChart" ? (
               <BarChart data={chartData} margin={{ left: 12, right: 12 }}>
                 <CartesianGrid vertical={false} />
