@@ -11,7 +11,6 @@ const app = express();
 
 app.use(cors({ origin: "*", credentials: true }));
 
-// Health Check
 app.get("/api/health", (req: Request, res: Response) => {
   logger.info("AI Service is running");
   res.status(200).json({

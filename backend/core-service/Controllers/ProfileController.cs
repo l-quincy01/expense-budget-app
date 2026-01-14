@@ -19,7 +19,7 @@ public class ProfileController : ControllerBase
         _logger = logger;
     }
 
-    //get/fetch
+ 
     [HttpGet]
     public async Task<IActionResult> GetProfile()
     {
