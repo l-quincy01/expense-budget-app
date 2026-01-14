@@ -40,7 +40,7 @@ BudgetlyAI makes sense of your finances without having to turn budgeting into a 
 | <img src="./screenshots/7.png" width="85%" /> | <img src="./screenshots/8.png" width="85%" /> |
 
 
-
+# Backend Architecture
 
 BudgetlyAI process statements through an AI pipeline, extracts spending data from the statements and persists this extracted data into mongoDB.
 
@@ -76,7 +76,7 @@ BudgetlyAI process statements through an AI pipeline, extracts spending data fro
 
 <br>
 
-# Backend Architecture
+
 
 ### Authentication & Authorization
 Clerk handles email-first authentication. Users receive OTP codes via email the .NET API validates Clerk JWTs and scopes data per user.
