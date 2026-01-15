@@ -20,10 +20,10 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: cd backend && dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore
+        run: cd backend && dotnet build --no-restore
 
       - name: Test
-        run: dotnet test --no-build
+        run: cd backend && dotnet test --no-build
