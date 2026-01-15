@@ -29,7 +29,7 @@ import {
 import { prettyLabel } from "@/utils/labelPrettier";
 import { useEffect, useState } from "react";
 import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
-import { sumCategoryTotalsByMonth } from "@/utils/sumCategories";
+import { sumCategoryTotalsByMonth } from "@/utils/chart/barchart/categories/sumCategoryTotalsByMonth";
 
 export const description = "A bar chart with a label";
 
@@ -75,12 +75,6 @@ export function BarChartCategories({ monthlyCategoryExpenditure }: props) {
     monthlyCategoryExpenditure,
     selectedCategory
   );
-
-  console.log(chartData);
-
-  //   useEffect(() => {
-  // const chartData = sumCategoryTotalsByMonth(monthlyCategoryExpenditure, selectedCategory)
-  //   }, [])
 
   return (
     <Card>

@@ -17,12 +17,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { MonthlyIncomeExpenseTotals } from "@/utils/sumExpenses";
+import { MonthlyIncomeExpenseTotals } from "@/utils/chart/barchart/incomeExpense/sumExpenses";
 import { useState } from "react";
 
 export const description = "A multiple bar chart";
-
-const chartData = [{ month: "January", expense: 186 }];
 
 interface props {
   incomeExpenseTotals: MonthlyIncomeExpenseTotals[];

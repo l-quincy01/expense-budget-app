@@ -37,7 +37,7 @@ export function calculateMonthlyTotals(
     month,
   }));
 }
-
+/*  helper */
 function extractNumber(value: any): number {
   if (typeof value === "number") {
     return value;

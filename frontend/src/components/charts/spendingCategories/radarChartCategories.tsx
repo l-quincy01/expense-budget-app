@@ -17,7 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { radarMonthsChartData } from "@/utils/sumMonths";
-import { radarCategoriesChartData } from "@/utils/sumCategories";
+import { radarCategoriesChartData } from "@/utils/chart/barchart/categories/sumCategories";
 
 export const description = "A radar chart with dots";
 

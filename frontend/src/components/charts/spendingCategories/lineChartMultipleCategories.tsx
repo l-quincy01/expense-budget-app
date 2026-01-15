@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
 import { prettyLabel } from "@/utils/labelPrettier";
+import { getTopCategories } from "@/utils/chart/lineChart/categories/getTopCategories";
+import { buildSeries } from "@/utils/chart/lineChart/categories/buildSeries";
 
 const MONTH_INDEX: Record<string, number> = {
   January: 1,
@@ -69,62 +71,6 @@ const ABBR_TO_FULL: Record<string, string> = {
   Nov: "November",
   Dec: "December",
 };
-
-function normalizeMonth(m: string) {
-  if (MONTH_INDEX[m] != null) return m;
-  const abbr = (m || "").slice(0, 3);
-  return ABBR_TO_FULL[abbr] ?? m;
-}
-
-function getTopCategories(
-  data: userMonthlyCategoryExpenditure[],
-  topN = 4
-): categories[] {
-  const totals = new Map<categories, number>();
-  for (const r of data) {
-    if (r.category === "Other") continue;
-    totals.set(
-      r.category as categories,
-      (totals.get(r.category as categories) ?? 0) + r.totalSpend
-    );
-  }
-  return [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, topN)
-    .map(([cat]) => cat);
-}
-
-function buildSeries(
-  data: userMonthlyCategoryExpenditure[],
-  topCats: categories[]
-) {
-  const months = [
-    ...new Set<string>(data.map((d) => normalizeMonth(d.month))),
-  ].sort((a, b) => (MONTH_INDEX[a] ?? 99) - (MONTH_INDEX[b] ?? 99));
-
-  const key = (m: string, c: categories) => `${m}__${c}`;
-  const index = new Map<string, number>();
-
-  for (const r of data) {
-    const m = normalizeMonth(r.month);
-    const c = r.category as categories;
-    index.set(
-      key(m, c),
-      (index.get(key(m, c)) ?? 0) + Number(r.totalSpend ?? 0)
-    );
-  }
-
-  return months.map((m) => {
-    const row: Record<string, number | string> = { month: m };
-    for (const c of topCats) {
-      row[c] = Number(index.get(key(m, c)) ?? 0);
-    }
-    row.totalSpend = [...index.keys()]
-      .filter((k) => k.startsWith(`${m}__`))
-      .reduce((sum, k) => sum + (index.get(k) ?? 0), 0);
-    return row;
-  });
-}
 
 function buildChartConfig(topCats: categories[]): ChartConfig {
   const palette = [

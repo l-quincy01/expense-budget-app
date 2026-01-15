@@ -18,13 +18,13 @@ import {
   userMonthlyTransactions,
 } from "@/types/types";
 import { RadarChartCategories } from "@/components/charts/spendingCategories/radarChartCategories";
-import { sumCategoriesForChart } from "@/utils/sumCategories";
+import { sumCategoriesForChart } from "@/utils/chart/barchart/categories/sumCategories";
 import { sumMonthsForChart } from "@/utils/sumMonths";
 import { BarchartIncomeExpense } from "@/components/charts/spendingTrends/barchartIncomeExpense";
-import { sumIncomeAndExpenses } from "@/utils/sumExpenses";
+import { sumIncomeAndExpenses } from "@/utils/chart/barchart/incomeExpense/sumExpenses";
 import { PieChartCategories } from "@/components/charts/spendingCategories/pieChartCategories";
 import { BarChartCategories } from "@/components/charts/spendingCategories/barChartCategories";
-import { combineByMonth } from "@/utils/aggregate";
+import { mergeMonthlyTransactionsWithStartingBalance } from "@/utils/chart/lineChart/incomeExpense/mergeMonthlyTransactions";
 
 type ChartsViewProps = {
   monthlyTransactions?: userMonthlyTransactions[];
@@ -80,7 +80,9 @@ export default function ChartsView({
           <>
             <BarchartIncomeExpense
               incomeExpenseTotals={sumIncomeAndExpenses(
-                combineByMonth(monthlyIncomeExpenseTransactions)
+                mergeMonthlyTransactionsWithStartingBalance(
+                  monthlyIncomeExpenseTransactions
+                )
               )}
             />
 

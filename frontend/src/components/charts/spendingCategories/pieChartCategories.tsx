@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { userMonthlyCategoryExpenditure } from "@/types/types";
-import { sumMonthAllCategoryTotals } from "@/utils/sumCategories";
+import { sumMonthAllCategoryTotals } from "@/utils/chart/pieChart/sumMonthAllCategoryTotals";
 
 interface props {
   monthlyCategoryExpenditure: userMonthlyCategoryExpenditure[];

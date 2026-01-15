@@ -102,7 +102,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
       .filter((item) => item.category === categoryName)
       .reduce((sum, item) => sum + item.totalSpend, 0);
   }
-  console.log("LENGHT:", userBudgets.length);
+
   return (
     <div className="space-y-2">
       <div className="gap-1">
