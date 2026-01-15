@@ -36,9 +36,8 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { combineByMonth } from "@/utils/aggregate";
-
-export const description = "A multiple line/area/bar chart with controls";
+import { mergeMonthlyTransactionsWithStartingBalance } from "@/utils/chart/lineChart/incomeExpense/mergeMonthlyTransactions";
+import { sortedMonthlyTransactions } from "@/utils/chart/lineChart/incomeExpense/sortedMonthlyTransactions";
 
 type ChartLineMultipleProps = {
   monthlyIncomeExpenseTransactions?: userMonthlyIncomeExpenseTransactions[];
@@ -102,22 +101,18 @@ export function LineChartIncomeExpenseBalance({
   const chartData = useMemo(() => {
     if (!monthlyIncomeExpenseTransactions.length) return [];
 
-    const unaggregated_normalizedBlocks = monthlyIncomeExpenseTransactions.map(
-      (block) => ({
-        month: block.month,
-        startingBalance: block.startingBalance,
-        transactions: [...(block.transactions ?? [])].sort(
-          (a, b) => Number(a.day) - Number(b.day)
-        ),
-      })
+    const sortedMonthlyTransactionBlocks = sortedMonthlyTransactions(
+      monthlyIncomeExpenseTransactions
     );
-    const normalizedBlocks = combineByMonth(unaggregated_normalizedBlocks);
 
-    console.log("NORMALIZED BLOCKS:", normalizedBlocks);
+    const mergedMonthlyTransactions =
+      mergeMonthlyTransactionsWithStartingBalance(
+        sortedMonthlyTransactionBlocks
+      );
 
-    const totalMonths = normalizedBlocks.length;
+    const totalMonths = mergedMonthlyTransactions.length;
 
-    let visibleBlocks = normalizedBlocks;
+    let visibleBlocks = mergedMonthlyTransactions;
 
     if (range !== "max") {
       const monthsToShowRaw = range === "1m" ? 1 : 3;
@@ -127,7 +122,7 @@ export function LineChartIncomeExpenseBalance({
       const start = Math.min(Math.max(0, windowStart), maxStartIndex);
       const end = start + monthsToShow;
 
-      visibleBlocks = normalizedBlocks.slice(start, end);
+      visibleBlocks = mergedMonthlyTransactions.slice(start, end);
     }
 
     return visibleBlocks.flatMap((block) => {
@@ -303,16 +298,6 @@ export function LineChartIncomeExpenseBalance({
                     style={{ cursor: "pointer" }}
                   />
                 )}
-                {/*            
-                    <Bar
-                      dataKey="income"
-                      fill="var(--income-color)"
-                      radius={1}
-                    />
-             
-
-                <Bar dataKey="expense" fill="var(--expense-color)" radius={1} />
-                <Bar dataKey="balance" fill="var(--balance-color)" radius={1} /> */}
               </BarChart>
             ) : areaChart ? (
               <AreaChart
@@ -370,34 +355,6 @@ export function LineChartIncomeExpenseBalance({
                     style={{ cursor: "pointer" }}
                   />
                 )}
-
-                {/* <Area
-                      dataKey="income"
-                      type={chartType}
-                      stroke="var(--income-color)"
-                      fill="var(--income-color)"
-                      fillOpacity={0.3}
-                      name="Income"
-                    />
-    
-
-                <Area
-                  dataKey="expense"
-                  type={chartType}
-                  stroke="var(--expense-color)"
-                  fill="var(--expense-color)"
-                  fillOpacity={0.3}
-                  name="Expense"
-                />
-
-                <Area
-                  dataKey="balance"
-                  type={chartType}
-                  stroke="var(--balance-color)"
-                  fill="var(--balance-color)"
-                  fillOpacity={0.2}
-                  name="Balance"
-                /> */}
               </AreaChart>
             ) : (
               <LineChart
@@ -455,34 +412,6 @@ export function LineChartIncomeExpenseBalance({
                     style={{ cursor: "pointer" }}
                   />
                 )}
-                {/* <Line
-                    dataKey="income"
-                    type={chartType}
-                    stroke="var(--income-color)"
-                    strokeWidth={2}
-                    dot={false}
-                    name="Income"
-     
-                  />
-       
-
-                <Line
-                  dataKey="expense"
-                  type={chartType}
-                  stroke="var(--expense-color)"
-                  strokeWidth={2}
-                  dot={false}
-                  name="Expense"
-                />
-
-                <Line
-                  dataKey="balance"
-                  type={chartType}
-                  stroke="var(--balance-color)"
-                  strokeWidth={2}
-                  dot={false}
-                  name="Balance"
-                /> */}
               </LineChart>
             )}
           </ChartContainer>

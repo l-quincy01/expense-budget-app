@@ -2,7 +2,7 @@ import { useApi } from "@/lib/api";
 import { dashboard } from "@/types/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { sortDashboardMonths } from "@/utils/sortDashboard";
+import { sortDashboardMonths } from "@/utils/dashboards/sortDashboard";
 
 export default function useDashboard(explicitName?: string) {
   const fetchApi = useApi();

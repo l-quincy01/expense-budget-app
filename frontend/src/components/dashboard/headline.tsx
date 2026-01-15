@@ -12,7 +12,10 @@ import { useProfile } from "@/hooks/useProfile";
 import { overview, userMonthlyIncomeExpenseTransactions } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddStatement from "./dialogs/statements-dialogs/add-statements";
-import { calculateMonthlyTotals, monthlyTotals } from "@/utils/overviewHandler";
+import {
+  calculateMonthlyTotals,
+  monthlyTotals,
+} from "@/utils/overview/calculateMonthlyTotals";
 import {
   Card,
   CardAction,

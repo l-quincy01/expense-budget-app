@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export function combineByMonth(data: any[]) {
+export function mergeMonthlyTransactionsWithStartingBalance(data: any[]) {
   const monthMap: {
     [month: string]: {
       month: string;
