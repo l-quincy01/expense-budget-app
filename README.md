@@ -7,7 +7,7 @@ BudgetlyAI makes sense of your finances without having to turn budgeting into a 
 
 
 
-<!-- ![image info](./screenshots/1.png) -->
+ 
 
 # User Interface
 ### Onboarding Screens
