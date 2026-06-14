@@ -1,8 +1,9 @@
 import {
   userMonthlyCategoryExpenditure,
   categoryIcons,
-  categories,
+  Category,
 } from "@/types/types";
+import { formatCategoryName, formatCurrency } from "@/lib/utils";
 import { Utensils } from "lucide-react";
 
 type SimpleTableManualProps = {
@@ -13,7 +14,7 @@ export default function SimpleTableManual({
   monthlyCategoryExpenditure = [],
 }: SimpleTableManualProps) {
   const totals = monthlyCategoryExpenditure.reduce((acc, row) => {
-    const key = row.category as categories;
+    const key = row.category as Category;
     acc[key] = (acc[key] ?? 0) + Number(row.totalSpend ?? 0);
     return acc;
   }, {} as Record<string, number>);
@@ -21,12 +22,6 @@ export default function SimpleTableManual({
   const sorted = Object.entries(totals)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
-
-  const formatRand = (value: number) =>
-    new Intl.NumberFormat("en-ZA", {
-      style: "currency",
-      currency: "ZAR",
-    }).format(value);
 
   return (
     <div className="flex flex-col gap-2 pb-4">
@@ -37,10 +32,11 @@ export default function SimpleTableManual({
       ) : (
         sorted.map(([category, amount]) => {
           const IconComponent =
-            categoryIcons[category as categories] ?? Utensils;
-          const displayName = category
-            .replace(/([a-z])([A-Z])/g, "$1 $2")
-            .replaceAll("And", "&");
+            categoryIcons[category as Category] ?? Utensils;
+          const displayName = formatCategoryName(category).replaceAll(
+            "And",
+            "&"
+          );
           return (
             <div
               key={category}
@@ -51,7 +47,7 @@ export default function SimpleTableManual({
               </div>
               <div className="text-sm font-medium">{displayName}</div>
               <div className="text-right font-semibold">
-                {formatRand(amount)}
+                {formatCurrency(amount)}
               </div>
             </div>
           );

@@ -1,5 +1,6 @@
 import { useApi } from "@/lib/api";
-import { dashboard } from "@/types/types";
+import { getErrorMessage } from "@/lib/utils";
+import { Dashboard } from "@/types/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { sortDashboardMonths } from "@/utils/dashboards/sortDashboard";
@@ -18,7 +19,7 @@ export default function useDashboard(explicitName?: string) {
   }, [params]);
   const dashboardName = explicitName ?? routeDashboardName;
 
-  const [userDashboard, setUserDashboard] = useState<dashboard>();
+  const [userDashboard, setUserDashboard] = useState<Dashboard>();
   const [userDashboardNames, setUserDashboardNames] = useState<string[]>([]);
   const [namesLoading, setNamesLoading] = useState(true);
   const [dashboardLoading, setDashboardLoading] = useState(false);
@@ -41,9 +42,7 @@ export default function useDashboard(explicitName?: string) {
       setError(null);
     } catch (e) {
       if (mountedRef.current)
-        setError(
-          e instanceof Error ? e.message : "Failed to load dashboard names"
-        );
+        setError(getErrorMessage(e, "Failed to load dashboard names"));
     } finally {
       if (mountedRef.current) setNamesLoading(false);
     }
@@ -64,7 +63,7 @@ export default function useDashboard(explicitName?: string) {
     (async () => {
       try {
         setDashboardLoading(true);
-        const dashboard = await fetchApi<dashboard>(
+        const dashboard = await fetchApi<Dashboard>(
           `/api/dashboards/${encodeURIComponent(dashboardName)}`
         );
         if (!mounted) return;
@@ -72,7 +71,7 @@ export default function useDashboard(explicitName?: string) {
         setError(null);
       } catch (e) {
         if (mounted)
-          setError(e instanceof Error ? e.message : "Failed to load dashboard");
+          setError(getErrorMessage(e, "Failed to load dashboard"));
       } finally {
         if (mounted) setDashboardLoading(false);
       }

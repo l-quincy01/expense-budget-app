@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { extractApiNumber } from "@/lib/utils";
+
 export interface userMonthlyIncomeExpenseTransactions {
   month: string;
   startingBalance: number;
@@ -26,8 +27,8 @@ export function calculateMonthlyTotals(
     const totals = monthlyMap.get(month)!;
 
     monthData.transactions.forEach((transaction) => {
-      totals.moneyIn += extractNumber(transaction.income);
-      totals.moneyOut += extractNumber(transaction.expense);
+      totals.moneyIn += extractApiNumber(transaction.income);
+      totals.moneyOut += extractApiNumber(transaction.expense);
     });
   });
 
@@ -36,21 +37,4 @@ export function calculateMonthlyTotals(
     moneyOut: Number(totals.moneyOut.toFixed(2)),
     month,
   }));
-}
-/*  helper */
-function extractNumber(value: any): number {
-  if (typeof value === "number") {
-    return value;
-  }
-
-  if (value && typeof value === "object") {
-    if (value.$numberInt) {
-      return parseInt(value.$numberInt, 10);
-    }
-    if (value.$numberDouble) {
-      return parseFloat(value.$numberDouble);
-    }
-  }
-
-  return 0;
 }

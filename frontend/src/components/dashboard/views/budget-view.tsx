@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -17,8 +16,8 @@ import EditBudgetDialog from "../dialogs/budgets-dialogs/edit-budget-dialog";
 import DeleteBudget from "../dialogs/budgets-dialogs/delete-budget";
 import InfoBudgetView from "../dialogs/budgets-dialogs/info-budgetView";
 import {
-  budgets,
-  categories,
+  Budget,
+  Category,
   categoryIcons,
   userMonthlyCategoryExpenditure,
 } from "@/types/types";
@@ -29,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useApi } from "@/lib/api";
+import { formatCategoryName, getErrorMessage } from "@/lib/utils";
 import { useParams } from "next/navigation";
 
 interface props {
@@ -43,7 +43,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
   const dashboardName = params?.dashboardName as string;
 
   const fetchApi = useApi();
-  const [userBudgets, setUserBudgets] = useState<any[]>([]);
+  const [userBudgets, setUserBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,15 +57,11 @@ export default function BudgetView({ categoriesExpenditure }: props) {
     };
   }, []);
 
-  const Icon = (category: categories | string) => {
-    const iconKey = (category as categories) ?? "Other";
-    const IconComponent = categoryIcons[iconKey as categories] ?? Utensils;
+  const Icon = (category: Category | string) => {
+    const iconKey = (category as Category) ?? "Other";
+    const IconComponent = categoryIcons[iconKey as Category] ?? Utensils;
     return <IconComponent size={28} />;
   };
-
-  function formatCategoryName(category: string): string {
-    return category.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
-  }
 
   const refreshBudgets = useCallback(async () => {
     try {
@@ -75,13 +71,13 @@ export default function BudgetView({ categoriesExpenditure }: props) {
         ? `/api/budgets?dashboardName=${encodeURIComponent(dashboardName)}`
         : `/api/budgets`;
 
-      const data = await fetchApi<any[]>(query);
+      const data = await fetchApi<Budget[]>(query);
       if (isMountedRef.current) {
         setUserBudgets(data);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (isMountedRef.current)
-        setError(err.message ?? "Failed to load budgets");
+        setError(getErrorMessage(err, "Failed to load budgets"));
     } finally {
       if (isMountedRef.current) setLoading(false);
     }

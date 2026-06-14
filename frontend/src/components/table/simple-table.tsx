@@ -1,20 +1,4 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Fuel, Handbag, ShoppingBasket, Utensils } from "lucide-react";
+import { Utensils } from "lucide-react";
 
 export default function SimpleTable() {
   return (

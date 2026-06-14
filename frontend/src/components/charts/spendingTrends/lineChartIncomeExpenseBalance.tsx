@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -44,11 +43,12 @@ type ChartLineMultipleProps = {
 };
 type Range = "1m" | "3m" | "max";
 type ActiveSeries = "all" | "income" | "expense" | "balance";
+type ChartType = "linear" | "natural" | "step" | "barMultiple";
 
 export function LineChartIncomeExpenseBalance({
   monthlyIncomeExpenseTransactions = [],
 }: ChartLineMultipleProps) {
-  const [chartType, setChartType] = useState<any>("linear");
+  const [chartType, setChartType] = useState<ChartType>("linear");
   const [areaChart, setAreaChart] = useState<boolean>(false);
   const [range, setRange] = useState<Range>("max");
   const [windowStart, setWindowStart] = useState<number>(0);
@@ -191,7 +191,7 @@ export function LineChartIncomeExpenseBalance({
 
           <Select
             defaultValue="linear"
-            onValueChange={(value) => setChartType(value)}
+            onValueChange={(value) => setChartType(value as ChartType)}
           >
             <SelectTrigger
               className="flex w-fit @4xl/main:hidden"

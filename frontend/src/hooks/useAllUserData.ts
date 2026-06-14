@@ -1,6 +1,7 @@
 // hooks/useAllUserData.ts
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
+import { getErrorMessage } from "@/lib/utils";
 import {
   userMonthlyTransactions,
   userMonthlyIncomeExpenseTransactions,
@@ -41,19 +42,11 @@ export function useAllUserData() {
 
         if (!mounted) return;
 
-        console.log("MongoDB JSON Data:", "\n");
-        console.log({
-          transactions: tx,
-          incomeExpense: ie,
-          categories: cats,
-        });
-        console.log("-", "\n");
-
         setTransactions(tx);
         setIncomeExpense(ie);
         setCategories(cats);
-      } catch (e: any) {
-        if (mounted) setError(e.message ?? "Failed to load data");
+      } catch (e: unknown) {
+        if (mounted) setError(getErrorMessage(e, "Failed to load data"));
       } finally {
         if (mounted) setLoading(false);
       }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -41,11 +40,13 @@ type ChartLineLinearProps = {
 };
 
 type Range = "1m" | "3m" | "max";
+type LineChartType = "linear" | "natural" | "step";
+type SpendingChartType = LineChartType | "barChart";
 
 export function LineChartSpending({
   monthlyTransactions = [],
 }: ChartLineLinearProps) {
-  const [chartType, setChartType] = useState("linear");
+  const [chartType, setChartType] = useState<SpendingChartType>("linear");
   const [areaChart, setAreaChart] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -162,7 +163,10 @@ export function LineChartSpending({
         </div>
 
         <div className="flex flex-row gap-2 items-center">
-          <Select defaultValue="linear" onValueChange={setChartType}>
+          <Select
+            defaultValue="linear"
+            onValueChange={(value) => setChartType(value as SpendingChartType)}
+          >
             <SelectTrigger className="flex w-fit">
               <SelectValue placeholder="Select a view" />
             </SelectTrigger>
@@ -250,7 +254,7 @@ export function LineChartSpending({
                 />
                 <Area
                   dataKey="amount"
-                  type={chartType}
+                  type={chartType as LineChartType}
                   fill="var(--color-amount)"
                   fillOpacity={0.4}
                   stroke="var(--color-amount)"
@@ -271,7 +275,7 @@ export function LineChartSpending({
                 />
                 <Line
                   dataKey="amount"
-                  type={chartType}
+                  type={chartType as LineChartType}
                   stroke="var(--color-amount)"
                   strokeWidth={2}
                   dot={false}

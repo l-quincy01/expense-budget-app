@@ -27,7 +27,7 @@ export type Profile = {
 };
 
 /*----------------- */
-export type categories =
+export type Category =
   | "GeneralRetail"
   | "Transport"
   | "EatingOutAndTreats"
@@ -45,7 +45,7 @@ export type categories =
   | "TravelAndHolidays"
   | "Other";
 
-export const categoryIcons: Record<categories, LucideIcon> = {
+export const categoryIcons: Record<Category, LucideIcon> = {
   GeneralRetail: ShoppingBag,
   Transport: Bus,
   EatingOutAndTreats: Coffee,
@@ -67,7 +67,7 @@ export const categoryIcons: Record<categories, LucideIcon> = {
 /* Interfaces ---------------------------------- */
 
 /* User generated data */
-export interface overview {
+export interface Overview {
   moneyIn: number;
   moneyOut: number;
   month: string;
@@ -75,10 +75,11 @@ export interface overview {
   totalBudget?: number;
 }
 
-export interface budgets {
+export interface Budget {
+  id: string;
   userId: string;
   dashboardName: string;
-  category: categories;
+  category: Category;
   budgetAmount: number;
   spentAmount: number;
 }
@@ -103,7 +104,7 @@ export interface userMonthlyIncomeExpenseTransactions {
 }
 export interface userMonthlyCategoryExpenditure {
   month: string;
-  category: categories;
+  category: Category;
   totalSpend: number;
 }
 
@@ -111,11 +112,11 @@ export interface userMonthlyCategoryExpenditure {
 Dashboard
 */
 
-export interface dashboard {
+export interface Dashboard {
   userId: string;
   name: string;
-  overview: overview[];
-  budgets?: budgets | budgets[] | null;
+  overview: Overview[];
+  budgets?: Budget | Budget[] | null;
   userMonthlyTransactions?: userMonthlyTransactions[];
   userMonthlyIncomeExpenseTransactions?: userMonthlyIncomeExpenseTransactions[];
   userMonthlyCategoryExpenditure?: userMonthlyCategoryExpenditure[];

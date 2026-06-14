@@ -1,7 +1,7 @@
-import { dashboard } from "@/types/types";
+import { Dashboard } from "@/types/types";
 
 export function getOpeningBalance(
-  userDashboard: dashboard,
+  userDashboard: Dashboard,
   targetMonth: string | undefined
 ) {
   if (!targetMonth) {
@@ -15,7 +15,7 @@ export function getOpeningBalance(
 }
 
 export function getClosingBalance(
-  userDashboard: dashboard,
+  userDashboard: Dashboard,
   targetMonth: string | undefined
 ) {
   if (!targetMonth) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
+import { getErrorMessage } from "@/lib/utils";
 import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
 
 export function useMonthlyIncomeExpense(dashboardName: string) {
@@ -23,8 +24,9 @@ export function useMonthlyIncomeExpense(dashboardName: string) {
           )}`
         );
         if (mounted) setData(res);
-      } catch (e: any) {
-        if (mounted) setError(e.message ?? "Failed to load income/expense");
+      } catch (e: unknown) {
+        if (mounted)
+          setError(getErrorMessage(e, "Failed to load income/expense"));
       } finally {
         if (mounted) setLoading(false);
       }

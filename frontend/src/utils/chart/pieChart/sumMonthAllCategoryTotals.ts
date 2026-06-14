@@ -1,18 +1,17 @@
-import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
-import { prettyLabel } from "../../../labelPrettier";
+import { Category, userMonthlyCategoryExpenditure } from "@/types/types";
 export interface radarCategoriesChartData {
   category: string;
   total: number;
 }
 export interface CategoryTotalsByMonth {
   month: string;
-  category: categories;
+  category: Category;
   totalSpend: number;
 }
 
 export interface MonthlyCategoryTotals {
   month: string;
-  category: categories;
+  category: Category;
   totalSpend: number;
   fill: string;
 }
@@ -21,7 +20,7 @@ export function sumMonthAllCategoryTotals(
   data: userMonthlyCategoryExpenditure[],
   monthName: string
 ): MonthlyCategoryTotals[] {
-  const map = new Map<categories, number>();
+  const map = new Map<Category, number>();
 
   for (const item of data) {
     if (item.month !== monthName) continue;

@@ -1,12 +1,19 @@
 import {
-  budgets,
+  Budget,
   userMonthlyCategoryExpenditure,
   userMonthlyIncomeExpenseTransactions,
   userMonthlyTransactions,
 } from "./types";
 
-export const userBudgets: budgets[] = [
-  { category: "GeneralRetail", budgetAmount: 5000, spentAmount: 2000 },
+export const userBudgets: Budget[] = [
+  {
+    id: "",
+    userId: "",
+    dashboardName: "",
+    category: "GeneralRetail",
+    budgetAmount: 5000,
+    spentAmount: 2000,
+  },
 ];
 
 export const userMonthlyTransactionsData: userMonthlyTransactions[] = [

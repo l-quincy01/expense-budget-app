@@ -1,13 +1,11 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -22,13 +20,12 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { prettyLabel } from "@/utils/labelPrettier";
-import { useEffect, useState } from "react";
-import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
+import { useState } from "react";
+import { Category, userMonthlyCategoryExpenditure } from "@/types/types";
 import { sumCategoryTotalsByMonth } from "@/utils/chart/barchart/categories/sumCategoryTotalsByMonth";
 
 export const description = "A bar chart with a label";
@@ -69,7 +66,7 @@ export function BarChartCategories({ monthlyCategoryExpenditure }: props) {
   } satisfies ChartConfig;
 
   const [selectedCategory, setSelectedCategory] =
-    useState<categories>("GeneralRetail");
+    useState<Category>("GeneralRetail");
 
   const chartData = sumCategoryTotalsByMonth(
     monthlyCategoryExpenditure,
@@ -87,7 +84,7 @@ export function BarChartCategories({ monthlyCategoryExpenditure }: props) {
           <Select
             defaultValue={`${categoriesArray[0]}`}
             value={selectedCategory}
-            onValueChange={(val: categories) => {
+            onValueChange={(val: Category) => {
               setSelectedCategory(val);
             }}
           >

@@ -20,11 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useApi } from "@/lib/api";
-import { categories, budgets } from "@/types/types";
+import { Budget, Category } from "@/types/types";
 import { toast } from "sonner";
 import { prettyLabel } from "@/utils/labelPrettier";
 
-const CATEGORY_OPTIONS: categories[] = [
+const CATEGORY_OPTIONS: Category[] = [
   "GeneralRetail",
   "Transport",
   "EatingOutAndTreats",
@@ -45,7 +45,7 @@ const CATEGORY_OPTIONS: categories[] = [
 
 type AddBudgetDialogProps = {
   dashboardName: string;
-  onBudgetCreated?: (budget: budgets) => void;
+  onBudgetCreated?: (budget: Budget) => void;
 };
 
 export default function AddBudgetDialog({
@@ -54,7 +54,7 @@ export default function AddBudgetDialog({
 }: AddBudgetDialogProps) {
   const api = useApi();
   const [isOpen, setIsOpen] = useState(false);
-  const [category, setCategory] = useState<categories>("GeneralRetail");
+  const [category, setCategory] = useState<Category>("GeneralRetail");
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -92,7 +92,7 @@ export default function AddBudgetDialog({
         spentAmount: 0,
       };
 
-      const created = await api<budgets>("/api/budgets", {
+      const created = await api<Budget>("/api/budgets", {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -132,7 +132,7 @@ export default function AddBudgetDialog({
               <Label htmlFor="category">Category</Label>
               <Select
                 value={category}
-                onValueChange={(value) => setCategory(value as categories)}
+                onValueChange={(value) => setCategory(value as Category)}
               >
                 <SelectTrigger className="flex w-full" id="category" size="sm">
                   <SelectValue placeholder="Select a category" />

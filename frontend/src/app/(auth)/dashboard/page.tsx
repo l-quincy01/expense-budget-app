@@ -4,9 +4,6 @@
 import { useEffect } from "react";
 import useDashboard from "@/hooks/useDashboard";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { CirclePlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
 export default function DashboardLanding() {

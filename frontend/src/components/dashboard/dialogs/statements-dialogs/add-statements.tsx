@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -10,7 +9,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { CopyPlus, FileText, LayoutDashboard, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,23 +17,14 @@ import { useAuth } from "@clerk/nextjs";
 
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
-
-type IngestResult = {
-  userId: string;
-  month: string;
-  transactionsInserted: number;
-  incomeExpensesInserted: number;
-  categoryRowsInserted: number;
-};
+import { getErrorMessage } from "@/lib/utils";
 
 export default function AddStatement() {
-  const { isSignedIn, userId, getToken } = useAuth();
+  const { isSignedIn, getToken } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<IngestResult | null>(null);
 
   const params = useParams();
   const dashboardName = params?.dashboardName as string;
@@ -48,9 +38,10 @@ export default function AddStatement() {
 
   const onSubmit = async () => {
     try {
-      setError(null);
-      if (!isSignedIn) return setError("Sign in to upload a statement.");
-      if (!files) return setError("Please select a PDF bank statement.");
+      if (!isSignedIn) {
+        toast.error("Sign in to upload a statement.");
+        return;
+      }
 
       const token = await getToken();
       if (!token) throw new Error("No Clerk token available.");
@@ -64,8 +55,7 @@ export default function AddStatement() {
       setIsUploading(true);
 
       // ADD: show loading toast
-      let uploadToastId: string | number | undefined;
-      uploadToastId = toast.loading(
+      const uploadToastId = toast.loading(
         "Uploading and processing your statement(s)…"
       );
 
@@ -81,7 +71,6 @@ export default function AddStatement() {
       if (!res.ok) throw new Error(await res.text());
 
       const data = await res.json();
-      setResult(data.nodeResponse || data);
       setFiles([]);
 
       setIsOpen(false);
@@ -104,10 +93,8 @@ export default function AddStatement() {
           },
         },
       });
-    } catch (err: any) {
-      const msg = err?.message || "Upload failed.";
-      setError(msg);
-
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Upload failed.");
       toast.error(msg);
     } finally {
       setIsUploading(false);
@@ -122,9 +109,7 @@ export default function AddStatement() {
         <DialogTrigger asChild>
           <button className="">
             <div className="flex flex-row items-center gap-2 p-2 bg-accent-foreground/90 hover:bg-accent-foreground/75 rounded-lg cursor-pointer">
-              {/* <FileText className="text-accent" strokeWidth={1.5} /> */}
               <Plus size={18} className="text-accent" />
-              {/* <span className="text-accent">Add </span> */}
             </div>
           </button>
         </DialogTrigger>
@@ -155,7 +140,6 @@ export default function AddStatement() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  setError(null);
                   setFiles([]);
                 }}
               >

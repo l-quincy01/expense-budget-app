@@ -1,7 +1,4 @@
-import {
-  categories,
-  userMonthlyIncomeExpenseTransactions,
-} from "@/types/types";
+import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
 
 export interface MonthlyIncomeExpenseTotals {
   month: string;

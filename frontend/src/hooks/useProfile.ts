@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useApi } from "@/lib/api";
+import { getErrorMessage } from "@/lib/utils";
 import { Profile } from "@/types/types";
 import { useEffect, useState, useRef } from "react";
 
@@ -20,8 +20,8 @@ export function useProfile() {
       try {
         const res = await fetchApi<Profile>("/api/profile");
         setData(res);
-      } catch (e: any) {
-        setError(e?.message ?? "Failed to load profile");
+      } catch (e: unknown) {
+        setError(getErrorMessage(e, "Failed to load profile"));
       } finally {
         setLoading(false);
       }
