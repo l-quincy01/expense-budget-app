@@ -22,20 +22,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FaBalanceScaleLeft } from "react-icons/fa";
-import useDashboard from "@/hooks/useDashboard";
 import { getClosingBalance } from "@/utils/overview/getDashboardBalances";
 import { incomePercentageSpentMessage } from "@/utils/overview/incomePercentageSpent";
 import { FaRegCreditCard } from "react-icons/fa";
+import { Dashboard } from "@/types/types";
 
 type HeadlineProps = {
   headlineData: userMonthlyIncomeExpenseTransactions[];
+  userDashboard: Dashboard;
+  onStatementUploaded?: () => Promise<void> | void;
 };
 
-export default function Headline({ headlineData = [] }: HeadlineProps) {
+export default function Headline({
+  headlineData = [],
+  userDashboard,
+  onStatementUploaded,
+}: HeadlineProps) {
   const { data, loading, error } = useProfile();
   const [monthTab, setMonthTab] = useState<string | undefined>();
   const [overviewEntries, setOverviewEntries] = useState<monthlyTotals[]>([]);
-  const { userDashboard } = useDashboard();
 
   useEffect(() => {
     if (headlineData.length > 0) {
@@ -66,7 +71,7 @@ export default function Headline({ headlineData = [] }: HeadlineProps) {
             your expense.
           </div>
         </div>
-        <AddStatement />
+        <AddStatement onUploaded={onStatementUploaded} />
       </div>
 
       {overviewEntries.length > 0 && (

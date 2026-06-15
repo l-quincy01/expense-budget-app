@@ -10,6 +10,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Toaster } from "sonner";
+import { DashboardProvider } from "@/components/providers/dashboard-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,14 +53,16 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <AppSidebar variant="floating" />
+              <DashboardProvider>
+                <AppSidebar variant="floating" />
 
-              <div className=" container mx-auto p-4">
-                <Header />
-                {children}
-                <Toaster />
-                <Footer />
-              </div>
+                <div className=" container mx-auto p-4">
+                  <Header />
+                  {children}
+                  <Toaster />
+                  <Footer />
+                </div>
+              </DashboardProvider>
             </ThemeProvider>
           </body>
         </html>

@@ -24,7 +24,11 @@ import {
   getIngestTransactionsInserted,
 } from "@/lib/api-adapters";
 
-export default function AddStatement() {
+type AddStatementProps = {
+  onUploaded?: () => Promise<void> | void;
+};
+
+export default function AddStatement({ onUploaded }: AddStatementProps) {
   const { isSignedIn } = useAuth();
   const api = useApi();
   const [files, setFiles] = useState<File[]>([]);
@@ -57,6 +61,7 @@ export default function AddStatement() {
       setFiles([]);
 
       setIsOpen(false);
+      await onUploaded?.();
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
       const transactionsInserted = getIngestTransactionsInserted(data);
@@ -67,11 +72,7 @@ export default function AddStatement() {
             : undefined,
         action: {
           label: "View",
-          onClick: () => {
-            window.location.href = `/dashboard/${encodeURIComponent(
-              dashboardName
-            )}`;
-          },
+          onClick: () => onUploaded?.(),
         },
       });
     } catch (err: unknown) {

@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { RiFunctionAddFill } from "react-icons/ri";
 import { getErrorMessage } from "@/lib/utils";
@@ -30,7 +29,6 @@ type AddDashboardProps = {
 export default function AddDashboard({ onCreated }: AddDashboardProps) {
   const { isSignedIn } = useAuth();
   const api = useApi();
-  const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [dashboardName, setDashboardName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -61,7 +59,6 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
       setIsOpen(false);
 
       await onCreated?.(createdDashboardName);
-      router.refresh();
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
       const transactionsInserted = getIngestTransactionsInserted(data);
@@ -72,11 +69,7 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
             : undefined,
         action: {
           label: "View",
-          onClick: () => {
-            window.location.href = `/dashboard/${encodeURIComponent(
-              createdDashboardName
-            )}`;
-          },
+          onClick: () => onCreated?.(createdDashboardName),
         },
       });
     } catch (err: unknown) {

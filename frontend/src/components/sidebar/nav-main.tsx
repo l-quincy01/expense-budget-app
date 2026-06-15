@@ -11,33 +11,39 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import AddDashboard from "./dialogs/add-dashboard";
-import useDashboard from "@/hooks/useDashboard";
+import { useDashboardContext } from "@/components/providers/dashboard-provider";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import DeleteDashboard from "./dialogs/delete-dashboard";
 
 export function NavMain() {
   const {
-    userDashboardNames,
+    dashboardNames,
     loading,
     error,
     selectedDashboardName,
     refreshDashboardNames,
-  } = useDashboard();
+    selectDashboard,
+  } = useDashboardContext();
   const pathname = usePathname();
   const router = useRouter();
 
   const handleDashboardDeleted = async (name: string) => {
-    const remaining = userDashboardNames.filter((dash) => dash !== name);
-    await refreshDashboardNames();
+    const remaining = dashboardNames.filter((dash) => dash !== name);
+    const refreshedNames = await refreshDashboardNames();
     if (selectedDashboardName === name) {
-      const fallback = remaining[0];
+      const fallback = refreshedNames.find((dash) => dash !== name) ?? remaining[0];
       if (fallback) {
-        router.push(`/dashboard/${encodeURIComponent(fallback)}`);
+        selectDashboard(fallback);
       } else {
         router.push("/dashboard");
       }
     }
+  };
+
+  const handleDashboardCreated = async (name: string) => {
+    await refreshDashboardNames();
+    selectDashboard(name);
   };
 
   return (
@@ -45,7 +51,7 @@ export function NavMain() {
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <AddDashboard onCreated={refreshDashboardNames} />
+            <AddDashboard onCreated={handleDashboardCreated} />
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarGroup>
@@ -67,7 +73,7 @@ export function NavMain() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )}
-            {!loading && !error && userDashboardNames.length === 0 && (
+            {!loading && !error && dashboardNames.length === 0 && (
               <SidebarMenuItem>
                 <SidebarMenuButton disabled>
                   <IconArticle />
@@ -75,7 +81,7 @@ export function NavMain() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )}
-            {userDashboardNames.map((name) => {
+            {dashboardNames.map((name) => {
               const encoded = encodeURIComponent(name);
               const isActive =
                 pathname === `/dashboard/${encoded}` ||
