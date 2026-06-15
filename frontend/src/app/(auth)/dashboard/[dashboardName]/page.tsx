@@ -1,10 +1,10 @@
 "use client";
 
-import Headline from "@/components/dashboard/headline";
-import BudgetView from "@/components/dashboard/views/budget-view";
-import ChartsView from "@/components/dashboard/views/charts-view";
-import TableView from "@/components/dashboard/views/table-view";
-import { useDashboardContext } from "@/components/providers/dashboard-provider";
+import Headline from "@/features/dashboard/components/headline";
+import BudgetView from "@/features/budgets/components/budget-view";
+import ChartsView from "@/features/dashboard/components/views/charts-view";
+import TableView from "@/features/dashboard/components/views/table-view";
+import { useDashboardContext } from "@/features/dashboard/components/providers/dashboard-provider";
 
 export default function DashboardDetailPage() {
   const {
