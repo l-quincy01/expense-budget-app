@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect } from "react";
-import { budgets } from "@/types/types";
 import { useApi } from "@/lib/api";
+import { budgetApi } from "@/lib/api-adapters";
+import { getErrorMessage } from "@/lib/utils";
+import { Budget } from "@/types/types";
 
 export function useBudgets() {
   const fetchApi = useApi();
-  const [data, setData] = useState<budgets[]>([]);
+  const [data, setData] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,10 +15,10 @@ export function useBudgets() {
     let mounted = true;
     (async () => {
       try {
-        const result = await fetchApi<budgets[]>("/api/budgets");
+        const result = await budgetApi.list(fetchApi);
         if (mounted) setData(result);
-      } catch (e: any) {
-        if (mounted) setError(e.message);
+      } catch (e: unknown) {
+        if (mounted) setError(getErrorMessage(e));
       } finally {
         if (mounted) setLoading(false);
       }

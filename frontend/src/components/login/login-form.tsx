@@ -14,7 +14,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 type Mode = "signin" | "signup" | "verify";
 
@@ -61,8 +61,8 @@ export function LoginForm({
       } else {
         setError("Additional verification required.");
       }
-    } catch (err: any) {
-      setError(err?.errors?.[0]?.message ?? "Sign in failed");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Sign in failed"));
     } finally {
       setSubmitting(false);
     }
@@ -83,8 +83,8 @@ export function LoginForm({
 
       await signUp!.prepareEmailAddressVerification({ strategy: "email_code" });
       setMode("verify");
-    } catch (err: any) {
-      setError(err?.errors?.[0]?.message ?? "Sign up failed");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Sign up failed"));
     } finally {
       setSubmitting(false);
     }
@@ -105,8 +105,8 @@ export function LoginForm({
       } else {
         setError("Verification not complete.");
       }
-    } catch (err: any) {
-      setError(err?.errors?.[0]?.message ?? "Invalid code");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Invalid code"));
     } finally {
       setSubmitting(false);
     }
@@ -120,8 +120,8 @@ export function LoginForm({
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       });
-    } catch (err: any) {
-      setError(err?.errors?.[0]?.message ?? "OAuth failed");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "OAuth failed"));
     }
   }
 

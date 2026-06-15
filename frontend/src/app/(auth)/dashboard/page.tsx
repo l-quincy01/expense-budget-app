@@ -2,24 +2,21 @@
 "use client";
 
 import { useEffect } from "react";
-import useDashboard from "@/hooks/useDashboard";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { CirclePlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
+import { useDashboardContext } from "@/components/providers/dashboard-provider";
 
 export default function DashboardLanding() {
   const { systemTheme } = useTheme();
 
   const router = useRouter();
-  const { userDashboardNames, loading, error } = useDashboard();
+  const { dashboardNames, loading, error } = useDashboardContext();
 
   useEffect(() => {
-    if (!loading && !error && userDashboardNames.length > 0) {
-      router.replace(`/dashboard/${encodeURIComponent(userDashboardNames[0])}`);
+    if (!loading && !error && dashboardNames.length > 0) {
+      router.replace(`/dashboard/${encodeURIComponent(dashboardNames[0])}`);
     }
-  }, [userDashboardNames, loading, error, router]);
+  }, [dashboardNames, loading, error, router]);
 
   if (error) {
     return (

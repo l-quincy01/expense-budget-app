@@ -1,4 +1,4 @@
-import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
+import { Category, userMonthlyCategoryExpenditure } from "@/types/types";
 
 export interface radarCategoriesChartData {
   category: string;
@@ -6,20 +6,20 @@ export interface radarCategoriesChartData {
 }
 export interface CategoryTotalsByMonth {
   month: string;
-  category: categories;
+  category: Category;
   totalSpend: number;
 }
 
 export interface MonthlyCategoryTotals {
   month: string;
-  category: categories;
+  category: Category;
   totalSpend: number;
   fill: string;
 }
 
 export function sumCategoryTotalsByMonth(
   data: userMonthlyCategoryExpenditure[],
-  categoryName: categories
+  categoryName: Category
 ): CategoryTotalsByMonth[] {
   const map = new Map<string, number>();
 

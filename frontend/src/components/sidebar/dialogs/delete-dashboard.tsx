@@ -9,6 +9,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useApi } from "@/lib/api";
+import { dashboardApi } from "@/lib/api-adapters";
+import { getErrorMessage } from "@/lib/utils";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -40,14 +42,11 @@ export default function DeleteDashboard({
 
     try {
       setIsSubmitting(true);
-      await api<void>(`/api/dashboards/${encodeURIComponent(dashboardName)}`, {
-        method: "DELETE",
-      });
+      await dashboardApi.delete(api, dashboardName);
       toast.success(`Dashboard "${dashboardName}" deleted.`);
       await onDeleted?.();
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to delete dashboard.";
+      const msg = getErrorMessage(err, "Failed to delete dashboard.");
       setFormError(msg);
       toast.error(msg);
     } finally {

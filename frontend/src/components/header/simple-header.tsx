@@ -1,21 +1,14 @@
 import React from "react";
-import { Grid2x2PlusIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetFooter } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MenuToggle } from "@/components/ui/menu-toggle";
 import Link from "next/link";
-import {
-  SignedIn,
-  SignedOut,
-  useClerk,
-  UserButton,
-  useUser,
-} from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 export function SimpleHeader() {
   const [open, setOpen] = React.useState(false);
   const { signOut } = useClerk();
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
 
   if (!isLoaded) return null;
 

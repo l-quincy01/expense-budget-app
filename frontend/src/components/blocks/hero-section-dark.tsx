@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 interface HeroSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
@@ -24,36 +25,13 @@ interface HeroSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   };
 }
 
-const RetroGrid = ({
-  angle = 65,
-  cellSize = 60,
-  opacity = 0.5,
-  lightLineColor = "gray",
-  darkLineColor = "gray",
-}) => {
-  const gridStyles = {
-    "--grid-angle": `${angle}deg`,
-    "--cell-size": `${cellSize}px`,
-    "--opacity": opacity,
-    "--light-line": lightLineColor,
-    "--dark-line": darkLineColor,
-  } as React.CSSProperties;
+function normalizeImageSrc(src: string) {
+  if (src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://")) {
+    return src;
+  }
 
-  return (
-    <div
-      className={cn(
-        "pointer-events-none absolute size-full overflow-hidden [perspective:200px]",
-        `opacity-[var(--opacity)]`
-      )}
-      style={gridStyles}
-    >
-      <div className="absolute inset-0 [transform:rotateX(var(--grid-angle))]">
-        <div className="animate-grid [background-image:linear-gradient(to_right,var(--light-line)_1px,transparent_0),linear-gradient(to_bottom,var(--light-line)_1px,transparent_0)] [background-repeat:repeat] [background-size:var(--cell-size)_var(--cell-size)] [height:300vh] [inset:0%_0px] [margin-left:-200%] [transform-origin:100%_0_0] [width:600vw] dark:[background-image:linear-gradient(to_right,var(--dark-line)_1px,transparent_0),linear-gradient(to_bottom,var(--dark-line)_1px,transparent_0)]" />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent to-90% dark:from-black" />
-    </div>
-  );
-};
+  return `/${src}`;
+}
 
 const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   (
@@ -76,6 +54,10 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
     },
     ref
   ) => {
+    void gridOptions;
+    const lightImageSrc = normalizeImageSrc(bottomImage.light);
+    const darkImageSrc = normalizeImageSrc(bottomImage.dark);
+
     return (
       <div className={cn("relative", className)} ref={ref} {...props}>
         <div className="absolute top-0 z-[0]  bg--950/10 dark:bg--950/10 " />
@@ -111,13 +93,17 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
             </div>
             {bottomImage && (
               <div className="mt-10 mx-10 relative z-10">
-                <img
-                  src={bottomImage.light}
+                <Image
+                  src={lightImageSrc}
+                  width={1200}
+                  height={675}
                   className="w-full shadow-lg rounded-lg border border-gray-200 dark:hidden"
                   alt="Dashboard preview"
                 />
-                <img
-                  src={bottomImage.dark}
+                <Image
+                  src={darkImageSrc}
+                  width={1200}
+                  height={675}
                   className="hidden w-full shadow-lg rounded-lg border border-gray-800 dark:block"
                   alt="Dashboard preview"
                 />

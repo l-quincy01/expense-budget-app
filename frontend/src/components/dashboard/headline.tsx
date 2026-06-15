@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  ArrowRightLeft,
-  Badge,
   BanknoteArrowDown,
   BanknoteArrowUp,
   MoveRight,
-  Wallet,
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { overview, userMonthlyIncomeExpenseTransactions } from "@/types/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddStatement from "./dialogs/statements-dialogs/add-statements";
 import {
   calculateMonthlyTotals,
@@ -24,22 +21,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
-import { FaBalanceScaleLeft, FaBalanceScaleRight } from "react-icons/fa";
-import useDashboard from "@/hooks/useDashboard";
+import { FaBalanceScaleLeft } from "react-icons/fa";
 import { getClosingBalance } from "@/utils/overview/getDashboardBalances";
 import { incomePercentageSpentMessage } from "@/utils/overview/incomePercentageSpent";
 import { FaRegCreditCard } from "react-icons/fa";
+import { Dashboard } from "@/types/types";
 
 type HeadlineProps = {
   headlineData: userMonthlyIncomeExpenseTransactions[];
+  userDashboard: Dashboard;
+  onStatementUploaded?: () => Promise<void> | void;
 };
 
-export default function Headline({ headlineData = [] }: HeadlineProps) {
+export default function Headline({
+  headlineData = [],
+  userDashboard,
+  onStatementUploaded,
+}: HeadlineProps) {
   const { data, loading, error } = useProfile();
   const [monthTab, setMonthTab] = useState<string | undefined>();
   const [overviewEntries, setOverviewEntries] = useState<monthlyTotals[]>([]);
-  const { userDashboard } = useDashboard();
 
   useEffect(() => {
     if (headlineData.length > 0) {
@@ -70,7 +71,7 @@ export default function Headline({ headlineData = [] }: HeadlineProps) {
             your expense.
           </div>
         </div>
-        <AddStatement />
+        <AddStatement onUploaded={onStatementUploaded} />
       </div>
 
       {overviewEntries.length > 0 && (

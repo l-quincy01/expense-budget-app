@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -10,7 +9,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { CopyPlus, FileText, LayoutDashboard, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,29 +17,27 @@ import { useAuth } from "@clerk/nextjs";
 
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { getErrorMessage } from "@/lib/utils";
+import { useApi } from "@/lib/api";
+import {
+  dashboardApi,
+  getIngestTransactionsInserted,
+} from "@/lib/api-adapters";
 
-type IngestResult = {
-  userId: string;
-  month: string;
-  transactionsInserted: number;
-  incomeExpensesInserted: number;
-  categoryRowsInserted: number;
+type AddStatementProps = {
+  onUploaded?: () => Promise<void> | void;
 };
 
-export default function AddStatement() {
-  const { isSignedIn, userId, getToken } = useAuth();
+export default function AddStatement({ onUploaded }: AddStatementProps) {
+  const { isSignedIn } = useAuth();
+  const api = useApi();
   const [files, setFiles] = useState<File[]>([]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<IngestResult | null>(null);
 
   const params = useParams();
   const dashboardName = params?.dashboardName as string;
-
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
-
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
     setFiles(selected);
@@ -48,66 +45,38 @@ export default function AddStatement() {
 
   const onSubmit = async () => {
     try {
-      setError(null);
-      if (!isSignedIn) return setError("Sign in to upload a statement.");
-      if (!files) return setError("Please select a PDF bank statement.");
-
-      const token = await getToken();
-      if (!token) throw new Error("No Clerk token available.");
-
-      const form = new FormData();
-      form.append("dashboardName", dashboardName);
-      files.forEach((file) => {
-        form.append("pdfs", file, file.name);
-      });
+      if (!isSignedIn) {
+        toast.error("Sign in to upload a statement.");
+        return;
+      }
 
       setIsUploading(true);
 
       // ADD: show loading toast
-      let uploadToastId: string | number | undefined;
-      uploadToastId = toast.loading(
+      const uploadToastId = toast.loading(
         "Uploading and processing your statement(s)…"
       );
 
-      const res = await fetch(
-        `${apiBase}/api/dashboards/${encodeURIComponent(dashboardName)}`,
-        {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
-        }
-      );
-
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json();
-      setResult(data.nodeResponse || data);
+      const data = await dashboardApi.uploadStatement(api, dashboardName, files);
       setFiles([]);
 
       setIsOpen(false);
+      await onUploaded?.();
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
+      const transactionsInserted = getIngestTransactionsInserted(data);
       toast.success(`Dashboard "${dashboardName}" updated.`, {
         description:
-          (data?.nodeResponse?.transactionsInserted ??
-            data?.transactionsInserted) != null
-            ? `${
-                (data.nodeResponse || data).transactionsInserted
-              } transactions ingested.`
+          transactionsInserted != null
+            ? `${transactionsInserted} transactions ingested.`
             : undefined,
         action: {
           label: "View",
-          onClick: () => {
-            window.location.href = `/dashboard/${encodeURIComponent(
-              dashboardName
-            )}`;
-          },
+          onClick: () => onUploaded?.(),
         },
       });
-    } catch (err: any) {
-      const msg = err?.message || "Upload failed.";
-      setError(msg);
-
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Upload failed.");
       toast.error(msg);
     } finally {
       setIsUploading(false);
@@ -122,9 +91,7 @@ export default function AddStatement() {
         <DialogTrigger asChild>
           <button className="">
             <div className="flex flex-row items-center gap-2 p-2 bg-accent-foreground/90 hover:bg-accent-foreground/75 rounded-lg cursor-pointer">
-              {/* <FileText className="text-accent" strokeWidth={1.5} /> */}
               <Plus size={18} className="text-accent" />
-              {/* <span className="text-accent">Add </span> */}
             </div>
           </button>
         </DialogTrigger>
@@ -155,7 +122,6 @@ export default function AddStatement() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  setError(null);
                   setFiles([]);
                 }}
               >

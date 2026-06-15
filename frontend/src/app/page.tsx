@@ -1,5 +1,4 @@
 import { HeroSection } from "@/components/blocks/hero-section-dark";
-import Image from "next/image";
 
 export default function Index() {
   return (

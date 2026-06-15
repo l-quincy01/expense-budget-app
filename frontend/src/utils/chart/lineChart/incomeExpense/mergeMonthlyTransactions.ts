@@ -1,5 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export function mergeMonthlyTransactionsWithStartingBalance(data: any[]) {
+import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
+
+export function mergeMonthlyTransactionsWithStartingBalance(
+  data: userMonthlyIncomeExpenseTransactions[]
+) {
   const monthMap: {
     [month: string]: {
       month: string;

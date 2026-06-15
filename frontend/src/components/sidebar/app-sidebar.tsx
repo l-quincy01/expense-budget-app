@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { IconArticle } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
 
@@ -15,7 +14,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useUser } from "@clerk/nextjs";
-import { useProfile } from "@/hooks/useProfile";
 import { NavUser } from "./nav-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

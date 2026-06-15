@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
+import { userDataApi } from "@/lib/api-adapters";
+import { getErrorMessage } from "@/lib/utils";
 import { userMonthlyIncomeExpenseTransactions } from "@/types/types";
 
 export function useMonthlyIncomeExpense(dashboardName: string) {
@@ -17,14 +19,11 @@ export function useMonthlyIncomeExpense(dashboardName: string) {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetchApi<userMonthlyIncomeExpenseTransactions>(
-          `/api/data/income-expense?dashboardName=${encodeURIComponent(
-            dashboardName
-          )}`
-        );
+        const res = await userDataApi.incomeExpense(fetchApi, dashboardName);
         if (mounted) setData(res);
-      } catch (e: any) {
-        if (mounted) setError(e.message ?? "Failed to load income/expense");
+      } catch (e: unknown) {
+        if (mounted)
+          setError(getErrorMessage(e, "Failed to load income/expense"));
       } finally {
         if (mounted) setLoading(false);
       }

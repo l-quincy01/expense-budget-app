@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
+import { Category, userMonthlyCategoryExpenditure } from "@/types/types";
 import { prettyLabel } from "@/utils/labelPrettier";
 import { getTopCategories } from "@/utils/chart/lineChart/categories/getTopCategories";
 import { buildSeries } from "@/utils/chart/lineChart/categories/buildSeries";
@@ -57,22 +56,7 @@ const MONTH_INDEX: Record<string, number> = {
 
 MONTH_INDEX["May"] = 5;
 
-const ABBR_TO_FULL: Record<string, string> = {
-  Jan: "January",
-  Feb: "February",
-  Mar: "March",
-  Apr: "April",
-  May: "May",
-  Jun: "June",
-  Jul: "July",
-  Aug: "August",
-  Sep: "September",
-  Oct: "October",
-  Nov: "November",
-  Dec: "December",
-};
-
-function buildChartConfig(topCats: categories[]): ChartConfig {
+function buildChartConfig(topCats: Category[]): ChartConfig {
   const palette = [
     "var(--chart-1)",
     "var(--chart-2)",
@@ -102,7 +86,7 @@ export function LineChartMultipleCategories({
       monthlyCategoryExpenditure.length === 0
     ) {
       return {
-        topCats: [] as categories[],
+        topCats: [] as Category[],
         chartData: [] as Record<string, number | string>[],
         chartConfig: buildChartConfig([]) as ChartConfig,
       };
@@ -121,7 +105,10 @@ export function LineChartMultipleCategories({
           <CardDescription>Total spend per month per category</CardDescription>
         </div>
 
-        <Select value={curve} onValueChange={(v) => setCurve(v as any)}>
+        <Select
+          value={curve}
+          onValueChange={(v) => setCurve(v as "linear" | "natural" | "step")}
+        >
           <SelectTrigger className="w-[140px]" id="curve-selector">
             <SelectValue placeholder="Line type" />
           </SelectTrigger>

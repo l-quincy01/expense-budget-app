@@ -4,16 +4,17 @@ import Headline from "@/components/dashboard/headline";
 import BudgetView from "@/components/dashboard/views/budget-view";
 import ChartsView from "@/components/dashboard/views/charts-view";
 import TableView from "@/components/dashboard/views/table-view";
-import useDashboard from "@/hooks/useDashboard";
+import { useDashboardContext } from "@/components/providers/dashboard-provider";
 
 export default function DashboardDetailPage() {
   const {
-    userDashboard,
-    userDashboardNames,
+    selectedDashboard,
+    dashboardNames,
     selectedDashboardName,
     loading,
     error,
-  } = useDashboard();
+    refreshDashboard,
+  } = useDashboardContext();
 
   if (loading) {
     return (
@@ -29,10 +30,10 @@ export default function DashboardDetailPage() {
     );
   }
 
-  if (!selectedDashboardName || !userDashboard) {
+  if (!selectedDashboardName || !selectedDashboard) {
     return (
       <div className="px-6 py-8 text-muted-foreground">
-        {userDashboardNames.length
+        {dashboardNames.length
           ? "Dashboard not found. Please pick another dashboard from the sidebar."
           : "You do not have any dashboards yet. Create one to get started."}
       </div>
@@ -42,26 +43,30 @@ export default function DashboardDetailPage() {
   return (
     <div className="flex flex-col gap-8 px-4 py-6 md:px-16">
       <Headline
-        headlineData={userDashboard.userMonthlyIncomeExpenseTransactions ?? []}
+        headlineData={
+          selectedDashboard.userMonthlyIncomeExpenseTransactions ?? []
+        }
+        userDashboard={selectedDashboard}
+        onStatementUploaded={() => refreshDashboard(selectedDashboardName)}
       />
       <BudgetView
         categoriesExpenditure={
-          userDashboard.userMonthlyCategoryExpenditure ?? []
+          selectedDashboard.userMonthlyCategoryExpenditure ?? []
         }
       />
       <ChartsView
-        monthlyTransactions={userDashboard.userMonthlyTransactions ?? []}
+        monthlyTransactions={selectedDashboard.userMonthlyTransactions ?? []}
         monthlyIncomeExpenseTransactions={
-          userDashboard.userMonthlyIncomeExpenseTransactions ?? []
+          selectedDashboard.userMonthlyIncomeExpenseTransactions ?? []
         }
         monthlyCategoryExpenditure={
-          userDashboard.userMonthlyCategoryExpenditure ?? []
+          selectedDashboard.userMonthlyCategoryExpenditure ?? []
         }
       />
       <TableView
-        monthlyTransactions={userDashboard.userMonthlyTransactions ?? []}
+        monthlyTransactions={selectedDashboard.userMonthlyTransactions ?? []}
         monthlyCategoryExpenditure={
-          userDashboard.userMonthlyCategoryExpenditure ?? []
+          selectedDashboard.userMonthlyCategoryExpenditure ?? []
         }
       />
     </div>

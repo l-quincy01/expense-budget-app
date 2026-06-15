@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
+import { userDataApi } from "@/lib/api-adapters";
+import { getErrorMessage } from "@/lib/utils";
 import { userMonthlyTransactions } from "@/types/types";
 
 export function useMonthlyTransactions(dashboardName: string) {
@@ -15,14 +17,10 @@ export function useMonthlyTransactions(dashboardName: string) {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetchApi<userMonthlyTransactions>(
-          `/api/data/transactions?dashboardName=${encodeURIComponent(
-            dashboardName
-          )}`
-        );
+        const res = await userDataApi.transactions(fetchApi, dashboardName);
         if (mounted) setData(res);
-      } catch (e: any) {
-        if (mounted) setError(e.message ?? "Failed to load transactions");
+      } catch (e: unknown) {
+        if (mounted) setError(getErrorMessage(e, "Failed to load transactions"));
       } finally {
         if (mounted) setLoading(false);
       }

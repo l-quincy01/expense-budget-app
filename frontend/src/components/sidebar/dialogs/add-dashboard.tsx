@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -10,40 +9,30 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { CirclePlus, CopyPlus, LayoutDashboard, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { RiFunctionAddFill } from "react-icons/ri";
-
-type IngestResult = {
-  userId: string;
-  month: string;
-  transactionsInserted: number;
-  incomeExpensesInserted: number;
-  categoryRowsInserted: number;
-};
+import { getErrorMessage } from "@/lib/utils";
+import { useApi } from "@/lib/api";
+import {
+  dashboardApi,
+  getIngestTransactionsInserted,
+} from "@/lib/api-adapters";
 
 type AddDashboardProps = {
   onCreated?: (dashboardName: string) => void | Promise<void>;
 };
 
 export default function AddDashboard({ onCreated }: AddDashboardProps) {
-  const { isSignedIn, userId, getToken } = useAuth();
-  const router = useRouter();
+  const { isSignedIn } = useAuth();
+  const api = useApi();
   const [files, setFiles] = useState<File[]>([]);
   const [dashboardName, setDashboardName] = useState("");
-  const [month, setMonth] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<IngestResult | null>(null);
-
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
-
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
     setFiles(selected);
@@ -51,67 +40,40 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
 
   const onSubmit = async () => {
     try {
-      setError(null);
-      if (!isSignedIn) return setError("Sign in to upload a statement.");
-      if (!files) return setError("Please select a PDF bank statement.");
-
-      const token = await getToken();
-      if (!token) throw new Error("No Clerk token available.");
-
-      const form = new FormData();
-      form.append("dashboardName", dashboardName);
-      files.forEach((file) => {
-        form.append("pdfs", file, file.name);
-      });
+      if (!isSignedIn) {
+        toast.error("Sign in to upload a statement.");
+        return;
+      }
 
       setIsUploading(true);
 
       // ADD: show loading toast
-      let uploadToastId: string | number | undefined;
-      uploadToastId = toast.loading(
+      const uploadToastId = toast.loading(
         "Uploading and processing your statement(s)…"
       );
 
-      const res = await fetch(`${apiBase}/api/dashboards`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json();
-      setResult(data.nodeResponse || data);
+      const data = await dashboardApi.create(api, dashboardName, files);
       const createdDashboardName = dashboardName;
       setFiles([]);
       setDashboardName("");
       setIsOpen(false);
 
       await onCreated?.(createdDashboardName);
-      router.refresh();
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
+      const transactionsInserted = getIngestTransactionsInserted(data);
       toast.success(`Dashboard "${createdDashboardName}" created.`, {
         description:
-          (data?.nodeResponse?.transactionsInserted ??
-            data?.transactionsInserted) != null
-            ? `${
-                (data.nodeResponse || data).transactionsInserted
-              } transactions ingested.`
+          transactionsInserted != null
+            ? `${transactionsInserted} transactions ingested.`
             : undefined,
         action: {
           label: "View",
-          onClick: () => {
-            window.location.href = `/dashboard/${encodeURIComponent(
-              createdDashboardName
-            )}`;
-          },
+          onClick: () => onCreated?.(createdDashboardName),
         },
       });
-    } catch (err: any) {
-      const msg = err?.message || "Upload failed.";
-      setError(msg);
-
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Upload failed.");
       toast.error(msg);
     } finally {
       setIsUploading(false);
@@ -122,13 +84,6 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
     <div className="space-y-4">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          {/* <button className="w-full">
-            <div className="flex flex-row items-center gap-2 p-2 bg-accent-foreground/90 hover:bg-accent-foreground/75 rounded-2xl cursor-pointer">
-              <Plus className="text-accent" strokeWidth={1.5} />
-
-              <span className="text-accent">New Dashboard</span>
-            </div>
-          </button> */}
           <Button variant={"outline"}>
             <RiFunctionAddFill />
 
@@ -166,10 +121,8 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
               <Button
                 variant="outline"
                 onClick={() => {
-                  setError(null);
                   setFiles([]);
                   setDashboardName("");
-                  setMonth("");
                 }}
               >
                 Reset

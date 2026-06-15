@@ -1,4 +1,4 @@
-import { dashboard } from "@/types/types";
+import { Dashboard } from "@/types/types";
 
 const MONTH_INDEX: Record<string, number> = {
   january: 0,
@@ -46,13 +46,13 @@ function sortByMonth<T extends { month: string }>(
 }
 
 export function sortDashboardMonths(
-  d: dashboard,
+  d: Dashboard,
   opts?: {
     order?: "asc" | "desc";
 
     sortDaysWithinMonth?: boolean;
   }
-): dashboard {
+): Dashboard {
   const order = opts?.order ?? "asc";
   const sortDays = opts?.sortDaysWithinMonth ?? false;
 

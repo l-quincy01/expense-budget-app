@@ -1,4 +1,4 @@
-import { categories, userMonthlyCategoryExpenditure } from "@/types/types";
+import { Category, userMonthlyCategoryExpenditure } from "@/types/types";
 
 const MONTH_INDEX: Record<string, number> = {
   January: 1,
@@ -55,18 +55,18 @@ function normalizeMonth(m: string) {
 
 export function buildSeries(
   data: userMonthlyCategoryExpenditure[],
-  topCats: categories[]
+  topCats: Category[]
 ) {
   const months = [
     ...new Set<string>(data.map((d) => normalizeMonth(d.month))),
   ].sort((a, b) => (MONTH_INDEX[a] ?? 99) - (MONTH_INDEX[b] ?? 99));
 
-  const key = (m: string, c: categories) => `${m}__${c}`;
+  const key = (m: string, c: Category) => `${m}__${c}`;
   const index = new Map<string, number>();
 
   for (const r of data) {
     const m = normalizeMonth(r.month);
-    const c = r.category as categories;
+    const c = r.category as Category;
     index.set(
       key(m, c),
       (index.get(key(m, c)) ?? 0) + Number(r.totalSpend ?? 0)
