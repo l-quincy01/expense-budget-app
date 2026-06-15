@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useDashboardContext } from "@/components/providers/dashboard-provider";
+import { useDashboardContext } from "@/features/dashboard/components/providers/dashboard-provider";
 
 export default function DashboardLanding() {
   const { systemTheme } = useTheme();

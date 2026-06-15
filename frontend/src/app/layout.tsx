@@ -8,9 +8,9 @@ import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { AppSidebar } from "@/features/dashboard/components/sidebar/app-sidebar";
 import { Toaster } from "sonner";
-import { DashboardProvider } from "@/components/providers/dashboard-provider";
+import { DashboardProvider } from "@/features/dashboard/components/providers/dashboard-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
