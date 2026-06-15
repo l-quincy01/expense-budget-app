@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Budget } from "@/types/types";
 import { useApi } from "@/lib/api";
+import { budgetApi } from "@/lib/api-adapters";
 import { getErrorMessage } from "@/lib/utils";
+import { Budget } from "@/types/types";
 
 export function useBudgets() {
   const fetchApi = useApi();
@@ -14,7 +15,7 @@ export function useBudgets() {
     let mounted = true;
     (async () => {
       try {
-        const result = await fetchApi<Budget[]>("/api/budgets");
+        const result = await budgetApi.list(fetchApi);
         if (mounted) setData(result);
       } catch (e: unknown) {
         if (mounted) setError(getErrorMessage(e));

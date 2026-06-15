@@ -17,21 +17,24 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { RiFunctionAddFill } from "react-icons/ri";
 import { getErrorMessage } from "@/lib/utils";
+import { useApi } from "@/lib/api";
+import {
+  dashboardApi,
+  getIngestTransactionsInserted,
+} from "@/lib/api-adapters";
 
 type AddDashboardProps = {
   onCreated?: (dashboardName: string) => void | Promise<void>;
 };
 
 export default function AddDashboard({ onCreated }: AddDashboardProps) {
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn } = useAuth();
+  const api = useApi();
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [dashboardName, setDashboardName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
-
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
     setFiles(selected);
@@ -44,15 +47,6 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
         return;
       }
 
-      const token = await getToken();
-      if (!token) throw new Error("No Clerk token available.");
-
-      const form = new FormData();
-      form.append("dashboardName", dashboardName);
-      files.forEach((file) => {
-        form.append("pdfs", file, file.name);
-      });
-
       setIsUploading(true);
 
       // ADD: show loading toast
@@ -60,15 +54,7 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
         "Uploading and processing your statement(s)…"
       );
 
-      const res = await fetch(`${apiBase}/api/dashboards`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json();
+      const data = await dashboardApi.create(api, dashboardName, files);
       const createdDashboardName = dashboardName;
       setFiles([]);
       setDashboardName("");
@@ -78,13 +64,11 @@ export default function AddDashboard({ onCreated }: AddDashboardProps) {
       router.refresh();
 
       if (uploadToastId !== undefined) toast.dismiss(uploadToastId);
+      const transactionsInserted = getIngestTransactionsInserted(data);
       toast.success(`Dashboard "${createdDashboardName}" created.`, {
         description:
-          (data?.nodeResponse?.transactionsInserted ??
-            data?.transactionsInserted) != null
-            ? `${
-                (data.nodeResponse || data).transactionsInserted
-              } transactions ingested.`
+          transactionsInserted != null
+            ? `${transactionsInserted} transactions ingested.`
             : undefined,
         action: {
           label: "View",

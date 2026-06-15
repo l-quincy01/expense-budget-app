@@ -20,9 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useApi } from "@/lib/api";
+import { budgetApi } from "@/lib/api-adapters";
 import { Budget, Category } from "@/types/types";
 import { toast } from "sonner";
 import { prettyLabel } from "@/utils/labelPrettier";
+import { getErrorMessage } from "@/lib/utils";
 
 const CATEGORY_OPTIONS: Category[] = [
   "GeneralRetail",
@@ -92,10 +94,7 @@ export default function AddBudgetDialog({
         spentAmount: 0,
       };
 
-      const created = await api<Budget>("/api/budgets", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      const created = await budgetApi.create(api, payload);
 
       onBudgetCreated?.(created);
       setAmount("");
@@ -103,8 +102,7 @@ export default function AddBudgetDialog({
       setIsOpen(false);
       toast.success(`Budget for ${prettyLabel(created.category)} created.`);
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to create the budget.";
+      const msg = getErrorMessage(err, "Failed to create the budget.");
       setFormError(msg);
       toast.error(msg);
     } finally {

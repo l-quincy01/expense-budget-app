@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useApi } from "@/lib/api";
+import { budgetApi } from "@/lib/api-adapters";
 import { formatCategoryName, getErrorMessage } from "@/lib/utils";
 import { useParams } from "next/navigation";
 
@@ -67,11 +68,7 @@ export default function BudgetView({ categoriesExpenditure }: props) {
     try {
       setLoading(true);
       setError(null);
-      const query = dashboardName
-        ? `/api/budgets?dashboardName=${encodeURIComponent(dashboardName)}`
-        : `/api/budgets`;
-
-      const data = await fetchApi<Budget[]>(query);
+      const data = await budgetApi.list(fetchApi, dashboardName);
       if (isMountedRef.current) {
         setUserBudgets(data);
       }

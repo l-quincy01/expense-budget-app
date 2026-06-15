@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
+import { userDataApi } from "@/lib/api-adapters";
 import { getErrorMessage } from "@/lib/utils";
 import { userMonthlyCategoryExpenditure } from "@/types/types";
 
@@ -16,11 +17,7 @@ export function useMonthlyCategoryExpenditure(dashboardName: string) {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetchApi<userMonthlyCategoryExpenditure[]>(
-          `/api/data/categories?dashboardName=${encodeURIComponent(
-            dashboardName
-          )}`
-        );
+        const res = await userDataApi.categories(fetchApi, dashboardName);
         if (mounted) setData(res);
       } catch (e: unknown) {
         if (mounted) setError(getErrorMessage(e, "Failed to load categories"));

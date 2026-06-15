@@ -9,6 +9,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useApi } from "@/lib/api";
+import { budgetApi } from "@/lib/api-adapters";
+import { getErrorMessage } from "@/lib/utils";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -40,15 +42,12 @@ export default function DeleteBudget({
 
     try {
       setIsSubmitting(true);
-      await fetchApi<void>(`/api/budgets/${budgetID}`, {
-        method: "DELETE",
-      });
+      await budgetApi.delete(fetchApi, budgetID);
 
       toast.success(`Budget successfully deleted.`);
       await onDeleted?.();
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to delete the budget.";
+      const msg = getErrorMessage(err, "Failed to delete the budget.");
       setFormError(msg);
       toast.error(msg);
     } finally {

@@ -1,9 +1,10 @@
 import { useApi } from "@/lib/api";
+import { dashboardApi } from "@/lib/api-adapters";
 import { getErrorMessage } from "@/lib/utils";
-import { Dashboard } from "@/types/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { sortDashboardMonths } from "@/utils/dashboards/sortDashboard";
+import { Dashboard } from "@/types/types";
 
 export default function useDashboard(explicitName?: string) {
   const fetchApi = useApi();
@@ -36,7 +37,7 @@ export default function useDashboard(explicitName?: string) {
   const refreshDashboardNames = useCallback(async () => {
     try {
       setNamesLoading(true);
-      const dashboardNames = await fetchApi<string[]>(`/api/dashboards/names`);
+      const dashboardNames = await dashboardApi.listNames(fetchApi);
       if (!mountedRef.current) return;
       setUserDashboardNames(dashboardNames);
       setError(null);
@@ -63,9 +64,7 @@ export default function useDashboard(explicitName?: string) {
     (async () => {
       try {
         setDashboardLoading(true);
-        const dashboard = await fetchApi<Dashboard>(
-          `/api/dashboards/${encodeURIComponent(dashboardName)}`
-        );
+        const dashboard = await dashboardApi.get(fetchApi, dashboardName);
         if (!mounted) return;
         setUserDashboard(sortDashboardMonths(dashboard));
         setError(null);

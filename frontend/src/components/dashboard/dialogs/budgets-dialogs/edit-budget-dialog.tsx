@@ -14,14 +14,17 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useApi } from "@/lib/api";
+import { budgetApi } from "@/lib/api-adapters";
+import { Category } from "@/types/types";
 import { toast } from "sonner";
 import { prettyLabel } from "@/utils/labelPrettier";
+import { getErrorMessage } from "@/lib/utils";
 
 interface EditBudgetDialogProps {
   budget: {
     id: string;
     dashboardName: string;
-    category: string;
+    category: Category;
     budgetAmount: number;
     spentAmount: number;
   };
@@ -58,22 +61,18 @@ export default function EditBudgetDialog({
 
     try {
       setIsSubmitting(true);
-      await api(`/api/budgets/${budget.id}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          dashboardName: budget.dashboardName,
-          category: budget.category,
-          budgetAmount: parsedAmount,
-          spentAmount: budget.spentAmount,
-        }),
+      await budgetApi.update(api, budget.id, {
+        dashboardName: budget.dashboardName,
+        category: budget.category,
+        budgetAmount: parsedAmount,
+        spentAmount: budget.spentAmount,
       });
 
       toast.success(`Updated budget for ${prettyLabel(budget.category)}.`);
       setIsOpen(false);
       await onBudgetUpdated?.();
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to update the budget.";
+      const msg = getErrorMessage(err, "Failed to update the budget.");
       setFormError(msg);
       toast.error(msg);
     } finally {

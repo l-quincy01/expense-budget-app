@@ -1,6 +1,7 @@
 // hooks/useAllUserData.ts
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/api";
+import { userDataApi } from "@/lib/api-adapters";
 import { getErrorMessage } from "@/lib/utils";
 import {
   userMonthlyTransactions,
@@ -31,13 +32,9 @@ export function useAllUserData() {
         setLoading(true);
 
         const [tx, ie, cats] = await Promise.all([
-          fetchApi<userMonthlyTransactions[]>(`/api/data/all/transactions`),
-          fetchApi<userMonthlyIncomeExpenseTransactions[]>(
-            `/api/data/all/income-expense`
-          ),
-          fetchApi<userMonthlyCategoryExpenditure[]>(
-            `/api/data/all/categories`
-          ),
+          userDataApi.allTransactions(fetchApi),
+          userDataApi.allIncomeExpense(fetchApi),
+          userDataApi.allCategories(fetchApi),
         ]);
 
         if (!mounted) return;
