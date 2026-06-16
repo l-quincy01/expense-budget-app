@@ -17,6 +17,7 @@ using MongoDB.Driver;
 public class TransactionsController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
+    private readonly ITransactionSearchService _transactionSearchService;
     private readonly ClerkAuthService _clerkAuth;
     private readonly ILogger<TransactionsController> _logger;
     private readonly MongoDbService _mongo;
@@ -24,11 +25,13 @@ public class TransactionsController : ControllerBase
     public TransactionsController(
         MongoDbService mongo,
         ITransactionService transactionService,
+        ITransactionSearchService transactionSearchService,
         ClerkAuthService clerkAuth,
         ILogger<TransactionsController> logger)
     {
         _mongo = mongo;
         _transactionService = transactionService;
+        _transactionSearchService = transactionSearchService;
         _clerkAuth = clerkAuth;
         _logger = logger;
     }
@@ -59,6 +62,53 @@ public class TransactionsController : ControllerBase
             .CreateTransactionAsync(userId, transaction);
 
         return Ok(created);
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchTransactions(
+        [FromQuery] string? query,
+        [FromQuery] string? category,
+        [FromQuery] DateOnly? from,
+        [FromQuery] DateOnly? to,
+        [FromQuery] decimal? minAmount,
+        [FromQuery] decimal? maxAmount,
+        [FromQuery] string? transactionType,
+        [FromQuery] Guid? statementId,
+        [FromQuery] string? dashboardName,
+        CancellationToken ct)
+    {
+        _logger.LogInformation("[SearchTransactions] Incoming request");
+
+        var (isAuth, userId) = await _clerkAuth.AuthenticateAsync(Request);
+        if (!isAuth || userId is null)
+        {
+            _logger.LogWarning("[SearchTransactions] Unauthorized request");
+            return Unauthorized();
+        }
+
+        if (from.HasValue && to.HasValue && from.Value > to.Value)
+        {
+            return BadRequest(new { error = "from must be earlier than or equal to to" });
+        }
+
+        if (minAmount.HasValue && maxAmount.HasValue && minAmount.Value > maxAmount.Value)
+        {
+            return BadRequest(new { error = "minAmount must be less than or equal to maxAmount" });
+        }
+
+        var request = new TransactionSearchRequest(
+            query,
+            category,
+            from,
+            to,
+            minAmount,
+            maxAmount,
+            transactionType,
+            statementId,
+            dashboardName);
+
+        var results = await _transactionSearchService.SearchAsync(userId, request, ct);
+        return Ok(results);
     }
 
     // ------------------------

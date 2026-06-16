@@ -1,6 +1,6 @@
 "use client";
 
-import { IconArticle } from "@tabler/icons-react";
+import { IconArticle, IconSearch } from "@tabler/icons-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -57,6 +57,18 @@ export function NavMain() {
         <SidebarGroup>
           <SidebarGroupLabel className="">Dashboards</SidebarGroupLabel>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                tooltip="Transactions Search"
+                isActive={pathname === "/dashboard/search"}
+              >
+                <Link href="/dashboard/search">
+                  <IconSearch size={16} />
+                  <span>Transactions Search</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             {loading && (
               <SidebarMenuItem>
                 <SidebarMenuButton disabled>
@@ -84,7 +96,7 @@ export function NavMain() {
             {dashboardNames.map((name) => {
               const encoded = encodeURIComponent(name);
               const isActive =
-                pathname === `/dashboard/${encoded}` ||
+                pathname === `/dashboard/${encoded}` &&
                 selectedDashboardName === name;
               return (
                 <SidebarMenuItem key={name}>

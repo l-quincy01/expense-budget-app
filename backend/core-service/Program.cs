@@ -16,6 +16,8 @@ using BudgetlyAI.Services.Budgets;
 using BudgetlyAI.Services.Dashboards;
 using BudgetlyAI.Services.Ingest;
 using BudgetlyAI.Services.Statements;
+using BudgetlyAI.Services.Caching;
+using BudgetlyAI.Services.Health;
 using MassTransit;
 
 Log.Logger = new LoggerConfiguration()
@@ -59,16 +61,23 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddHttpClient<ITransactionSearchService, ElasticsearchTransactionSearchService>();
 
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
+builder.Services.AddSingleton<IDashboardCache, RedisDashboardCache>();
 
 builder.Services.AddScoped<INodeIngestClient, NodeIngestClient>();
 
 builder.Services.AddScoped<IStatementFileStorage, StatementFileStorage>();
 builder.Services.AddScoped<IStatementEventPublisher, MassTransitStatementEventPublisher>();
 builder.Services.AddScoped<IStatementService, StatementService>();
+builder.Services.AddScoped<IDependencyHealthCheck, PostgresDependencyHealthCheck>();
+builder.Services.AddScoped<IDependencyHealthCheck, RedisDependencyHealthCheck>();
+builder.Services.AddScoped<IDependencyHealthCheck, RabbitMqDependencyHealthCheck>();
+builder.Services.AddHttpClient<IDependencyHealthCheck, ElasticsearchDependencyHealthCheck>();
+builder.Services.AddHttpClient<IDependencyHealthCheck, AiServiceDependencyHealthCheck>();
 
 
 

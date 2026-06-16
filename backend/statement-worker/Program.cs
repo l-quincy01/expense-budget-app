@@ -17,6 +17,7 @@ builder.Services.AddHttpClient<IAiStatementExtractionClient, AiStatementExtracti
 builder.Services.AddSingleton<IDashboardReadModelWriter, MongoDashboardReadModelWriter>();
 builder.Services.AddSingleton<IMessageRetryStatus, MassTransitMessageRetryStatus>();
 builder.Services.AddSingleton<IDashboardCacheInvalidator, RedisDashboardCacheInvalidator>();
+builder.Services.AddHttpClient<ITransactionSearchIndexer, ElasticsearchTransactionSearchIndexer>();
 
 builder.Services.AddMassTransit(x =>
 {
