@@ -21,9 +21,10 @@ public class StatementUploadedConsumerTests
         await context.SaveChangesAsync();
         var aiClient = new FakeAiClient { Result = CreateValidExtractionResult() };
         var dashboardWriter = new FakeDashboardWriter();
+        var indexer = new FakeTransactionSearchIndexer();
         var cacheInvalidator = new FakeCacheInvalidator();
 
-        var consumer = CreateConsumer(context, aiClient, dashboardWriter, cacheInvalidator);
+        var consumer = CreateConsumer(context, aiClient, dashboardWriter, indexer, cacheInvalidator);
         var message = new StatementUploaded(
             upload.Id,
             upload.UserId,
@@ -45,6 +46,7 @@ public class StatementUploadedConsumerTests
             t.Description == "Extracted statement transaction" &&
             t.Date == new DateTime(2026, 1, 12));
         dashboardWriter.Upserts.Should().ContainSingle(u => u.UploadId == upload.Id);
+        indexer.Indexed.Should().ContainSingle(batch => batch.Count == 1);
         cacheInvalidator.UserIds.Should().ContainSingle().Which.Should().Be(upload.UserId);
         aiClient.Calls.Should().ContainSingle(u => u.Id == upload.Id);
     }
@@ -128,6 +130,36 @@ public class StatementUploadedConsumerTests
     }
 
     [Fact]
+    public async Task Consume_IndexingExceptionMarksFailedAndThrowsOnFinalAttempt()
+    {
+        using var context = CreateContext();
+        var upload = CreateUpload();
+        context.StatementUploads.Add(upload);
+        await context.SaveChangesAsync();
+        var aiClient = new FakeAiClient { Result = CreateValidExtractionResult() };
+        var indexer = new FakeTransactionSearchIndexer
+        {
+            Exception = new InvalidOperationException("Elasticsearch unavailable")
+        };
+
+        var consumer = CreateConsumer(
+            context,
+            aiClient,
+            transactionSearchIndexer: indexer,
+            retryAttempt: 3);
+
+        var act = () => consumer.Consume(CreateConsumeContext(CreateMessage(upload)));
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Elasticsearch unavailable");
+        var saved = await context.StatementUploads.SingleAsync(s => s.Id == upload.Id);
+        saved.Status.Should().Be(StatementStatus.Failed);
+        saved.ErrorMessage.Should().Be("Elasticsearch unavailable");
+        saved.ProcessedAt.Should().NotBeNull();
+        context.ExtractedTransactions.Should().ContainSingle(t => t.StatementUploadId == upload.Id);
+    }
+
+    [Fact]
     public async Task Consume_MetadataMismatchDoesNotProcess()
     {
         using var context = CreateContext();
@@ -196,6 +228,7 @@ public class StatementUploadedConsumerTests
         StatementWorkerDbContext context,
         IAiStatementExtractionClient aiClient,
         IDashboardReadModelWriter? dashboardWriter = null,
+        ITransactionSearchIndexer? transactionSearchIndexer = null,
         IDashboardCacheInvalidator? cacheInvalidator = null,
         int retryAttempt = 0)
     {
@@ -203,6 +236,7 @@ public class StatementUploadedConsumerTests
             context,
             aiClient,
             dashboardWriter ?? new FakeDashboardWriter(),
+            transactionSearchIndexer ?? new FakeTransactionSearchIndexer(),
             cacheInvalidator ?? new FakeCacheInvalidator(),
             new FakeRetryStatus(retryAttempt),
             Mock.Of<ILogger<StatementUploadedConsumer>>());
@@ -330,6 +364,25 @@ public class StatementUploadedConsumerTests
         public Task InvalidateUserAsync(string userId, CancellationToken ct = default)
         {
             UserIds.Add(userId);
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class FakeTransactionSearchIndexer : ITransactionSearchIndexer
+    {
+        public List<IReadOnlyCollection<ExtractedTransactionRecord>> Indexed { get; } = [];
+        public Exception? Exception { get; set; }
+
+        public Task IndexAsync(
+            IReadOnlyCollection<ExtractedTransactionRecord> transactions,
+            CancellationToken ct = default)
+        {
+            if (Exception is not null)
+            {
+                throw Exception;
+            }
+
+            Indexed.Add(transactions);
             return Task.CompletedTask;
         }
     }

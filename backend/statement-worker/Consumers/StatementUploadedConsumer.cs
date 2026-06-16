@@ -13,6 +13,7 @@ public sealed class StatementUploadedConsumer : IConsumer<StatementUploaded>
     private readonly StatementWorkerDbContext _context;
     private readonly IAiStatementExtractionClient _aiClient;
     private readonly IDashboardReadModelWriter _dashboardWriter;
+    private readonly ITransactionSearchIndexer _transactionSearchIndexer;
     private readonly IDashboardCacheInvalidator _cacheInvalidator;
     private readonly IMessageRetryStatus _retryStatus;
     private readonly ILogger<StatementUploadedConsumer> _logger;
@@ -21,6 +22,7 @@ public sealed class StatementUploadedConsumer : IConsumer<StatementUploaded>
         StatementWorkerDbContext context,
         IAiStatementExtractionClient aiClient,
         IDashboardReadModelWriter dashboardWriter,
+        ITransactionSearchIndexer transactionSearchIndexer,
         IDashboardCacheInvalidator cacheInvalidator,
         IMessageRetryStatus retryStatus,
         ILogger<StatementUploadedConsumer> logger)
@@ -28,6 +30,7 @@ public sealed class StatementUploadedConsumer : IConsumer<StatementUploaded>
         _context = context;
         _aiClient = aiClient;
         _dashboardWriter = dashboardWriter;
+        _transactionSearchIndexer = transactionSearchIndexer;
         _cacheInvalidator = cacheInvalidator;
         _retryStatus = retryStatus;
         _logger = logger;
@@ -89,6 +92,10 @@ public sealed class StatementUploadedConsumer : IConsumer<StatementUploaded>
 
             _context.ExtractedTransactions.AddRange(extractedTransactions);
             await _context.SaveChangesAsync(context.CancellationToken);
+
+            await _transactionSearchIndexer.IndexAsync(
+                extractedTransactions,
+                context.CancellationToken);
 
             await _dashboardWriter.UpsertAsync(upload, extraction, context.CancellationToken);
 
