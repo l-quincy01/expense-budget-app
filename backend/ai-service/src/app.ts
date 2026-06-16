@@ -6,6 +6,7 @@ import { connectMongo } from "#db/mongo.js";
 
 import logger from "#config/logger.js";
 import dashboardRoutes from "#routes/dashboard.routes";
+import statementRoutes from "#routes/statement.routes";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/dashboards", dashboardRoutes);
+app.use("/api/statements", statementRoutes);
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: "Route not Found on AI Service" });
 });
