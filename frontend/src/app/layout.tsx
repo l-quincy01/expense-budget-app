@@ -4,13 +4,9 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 
 import "./globals.css";
 
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/features/dashboard/components/sidebar/app-sidebar";
 import { Toaster } from "sonner";
-import { DashboardProvider } from "@/features/dashboard/components/providers/dashboard-provider";
+import { PublicShell } from "@/components/layout/public-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,40 +29,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider signInUrl="/login">
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "calc(var(--spacing) * 54)",
-            "--header-height": "calc(var(--spacing) * 12)",
-          } as React.CSSProperties
-        }
+    <html lang="en" suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <html lang="en" suppressHydrationWarning>
-          <body
-            suppressHydrationWarning
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        <ClerkProvider signInUrl="/login">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
           >
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <DashboardProvider>
-                <AppSidebar variant="floating" />
-
-                <div className=" container mx-auto p-4">
-                  <Header />
-                  {children}
-                  <Toaster />
-                  <Footer />
-                </div>
-              </DashboardProvider>
-            </ThemeProvider>
-          </body>
-        </html>
-      </SidebarProvider>
-    </ClerkProvider>
+            <PublicShell>{children}</PublicShell>
+            <Toaster />
+          </ThemeProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

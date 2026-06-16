@@ -28,6 +28,8 @@
   <ItemGroup>
 
     <ProjectReference Include="..\..\core-service\backend.csproj" />
+
+    <ProjectReference Include="..\..\statement-worker\statement-worker.csproj" />
   </ItemGroup>
 
 </Project>

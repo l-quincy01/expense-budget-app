@@ -15,6 +15,8 @@ using BudgetlyAI.Services.Transactions;
 using BudgetlyAI.Services.Budgets;
 using BudgetlyAI.Services.Dashboards;
 using BudgetlyAI.Services.Ingest;
+using BudgetlyAI.Services.Statements;
+using MassTransit;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -64,6 +66,10 @@ builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
 
 builder.Services.AddScoped<INodeIngestClient, NodeIngestClient>();
 
+builder.Services.AddScoped<IStatementFileStorage, StatementFileStorage>();
+builder.Services.AddScoped<IStatementEventPublisher, MassTransitStatementEventPublisher>();
+builder.Services.AddScoped<IStatementService, StatementService>();
+
 
 
 // Postgres
@@ -79,6 +85,22 @@ builder.Services.AddHttpClient("AiIngest")
     .ConfigureHttpClient(c => { c.Timeout = TimeSpan.FromMinutes(20); });
 
 builder.Services.AddHttpClient();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
+        var rabbitUser = builder.Configuration["RabbitMq:Username"] ?? "guest";
+        var rabbitPassword = builder.Configuration["RabbitMq:Password"] ?? "guest";
+
+        cfg.Host(rabbitHost, "/", h =>
+        {
+            h.Username(rabbitUser);
+            h.Password(rabbitPassword);
+        });
+    });
+});
 
 // Clerk
 builder.Services.AddSingleton(_ =>
